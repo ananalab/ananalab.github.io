@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D scene viewer</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #a0a0a0; overflow: hidden;
+    font: 12px/1.4 ui-monospace, "SF Mono", Menlo, monospace; color: #3a3a3a; }
+  #view { position: fixed; inset: 0; cursor: grab; }
+  #view:active { cursor: grabbing; }
+  #view canvas { display: block; width: 100%; height: 100%; }
+  .zoom { position: fixed; right: 8px; bottom: 8px; display: grid; gap: 4px; }
+  .zoom button { width: 24px; height: 24px; border: 0; border-radius: 6px; padding: 0;
+    background: rgba(255,255,255,.45); color: rgba(0,0,0,.6); font: 400 15px/1 system-ui, sans-serif;
+    cursor: pointer; touch-action: manipulation; transition: background .15s, color .15s; }
+  .zoom button:hover { background: rgba(255,255,255,.8); color: #000; }
+  .zoom button:focus-visible { outline: 2px solid #12776c; outline-offset: 2px; }
+  #msg { position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="view"></div>
+<div id="msg">Loading the scene…</div>
+<div class="zoom">
+  <button type="button" id="zoom-in" aria-label="Zoom in" title="Zoom in">+</button>
+  <button type="button" id="zoom-out" aria-label="Zoom out" title="Zoom out">−</button>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const msg = document.getElementById('msg');
+const container = document.getElementById('view');
+
+// The scene comes as a script that sets window.SCENE_GLB (base64), so the viewer
+// also works when the portfolio is opened straight from disk, where fetch() is blocked.
+const params = new URLSearchParams(location.search);
+const name = params.get('scene');
+if (!/^[a-z0-9-]+$/.test(name || '')) throw msg.textContent = 'No scene given';
+await new Promise((ok, fail) => {
+  const s = document.createElement('script');
+  s.src = `${name}.js`; s.onload = ok; s.onerror = fail;
+  document.head.appendChild(s);
+}).catch(() => { msg.textContent = 'Could not load the scene'; throw new Error(name); });
+const bytes = Uint8Array.from(atob(window.SCENE_GLB), c => c.charCodeAt(0));
+delete window.SCENE_GLB;
+
+// Same look as the Brax viewer used for the legged-robot project:
+// grey sky with fog, grey checkerboard floor, hemisphere light plus one shadow-casting sun.
+const SKY = 0xa0a0a0;
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+container.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(SKY);
+
+// Brax used three r135 lighting; r160 lights are physically based, hence the factor pi
+const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, Math.PI * 0.9);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xffffff, Math.PI * 0.85);
+sun.castShadow = true;
+sun.shadow.mapSize.set(4096, 4096);
+sun.shadow.bias = -0.0004;
+sun.shadow.normalBias = 0.002;
+scene.add(sun, sun.target);
+
+function checkerFloor(tile) {
+  const c = [new THREE.Color(0x999999), new THREE.Color(0x888888)];
+  const data = new Uint8Array(16);
+  [0, 1, 1, 0].forEach((k, i) => {
+    const col = c[k].clone().convertLinearToSRGB();
+    data.set([col.r * 255, col.g * 255, col.b * 255, 255], i * 4);
+  });
+  const tex = new THREE.DataTexture(data, 2, 2);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.magFilter = THREE.NearestFilter;
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  const size = tile * 2 * 400;
+  tex.repeat.set(400, 400);
+  tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  tex.needsUpdate = true;
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(size, size),
+    new THREE.MeshPhongMaterial({ map: tex, shininess: 0 }));
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  return floor;
+}
+
+const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 200);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.enableZoom = false;   // the wheel keeps scrolling the portfolio page
+controls.enablePan = false;
+controls.maxPolarAngle = Math.PI / 2 - 0.08;
+
+// Starting views chosen to match the input (the photo's viewpoint for the photo scene)
+const VIEWS = { photo: { az: 115, el: 40 }, prompt: { az: 300, el: 28 } };
+
+// Colour of the box primitive in the Genesis render; the export kept no colour for it
+const GENESIS_BOX = 0xb0602f;
+
+new GLTFLoader().parse(bytes.buffer, '', (gltf) => {
+  const model = gltf.scene;
+  model.traverse((o) => {
+    if (!o.isMesh) return;
+    o.castShadow = true;
+    o.receiveShadow = true;
+    const noNormals = !o.geometry.attributes.normal;   // the box and the screwdriver
+    if (noNormals) o.geometry.computeVertexNormals();
+    const old = o.material;
+    // The export multiplies textures by 0.4 and leaves metalness at its default of 1,
+    // which renders everything dark grey. Rebuild plain, matte materials instead.
+    const m = new THREE.MeshStandardMaterial({
+      map: old.map || null,
+      vertexColors: !!o.geometry.attributes.color,
+      metalness: 0,
+      roughness: 0.75,
+      side: old.side,
+      flatShading: noNormals,   // shared corners would otherwise smear the shading across faces
+    });
+    if (!old.map && !o.geometry.attributes.color) {
+      const plain = old.color && old.color.getHex() !== 0xffffff ? old.color : null;
+      m.color.set(plain || (/^boîte en plastique/.test(o.name.replace(/_/g, ' ')) ? GENESIS_BOX : 0xf2f2f2));
+    }
+    o.material = m;
+  });
+  scene.add(model);
+
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3()).length();
+  const center = box.getCenter(new THREE.Vector3());
+  const floor = checkerFloor(size / 4);
+  floor.position.y = box.min.y - 0.001;
+  scene.add(floor);
+
+  controls.target.copy(center);
+  // Starting view, in degrees: azimuth around the vertical axis and elevation above the floor
+  const v = VIEWS[name] || { az: -45, el: 22 };
+  const az = THREE.MathUtils.degToRad(+(params.get('az') ?? v.az)), el = THREE.MathUtils.degToRad(+(params.get('el') ?? v.el));
+  const view = new THREE.Vector3(Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az)).multiplyScalar(size * 1.53);
+  camera.position.copy(center).add(view);
+  const dist = view.length();
+  scene.fog = new THREE.Fog(SKY, dist * 4, dist * 6);
+  zoomLimits = [dist * 0.35, dist * 2.2];
+
+  sun.position.copy(center).add(new THREE.Vector3(3, 10, 10).normalize().multiplyScalar(size * 3));
+  sun.target.position.copy(center);
+  Object.assign(sun.shadow.camera, { left: -size, right: size, top: size, bottom: -size, near: 0.01, far: size * 8 });
+  sun.shadow.camera.updateProjectionMatrix();
+  msg.remove();
+}, () => { msg.textContent = 'Could not read the scene'; });
+
+// Zoom buttons (the mouse wheel stays with the page, so it keeps scrolling)
+let zoomLimits = null;
+function zoom(factor) {
+  if (!zoomLimits) return;
+  const offset = camera.position.clone().sub(controls.target);
+  offset.setLength(THREE.MathUtils.clamp(offset.length() * factor, ...zoomLimits));
+  camera.position.copy(controls.target).add(offset);
+}
+document.getElementById('zoom-in').addEventListener('click', () => zoom(0.8));
+document.getElementById('zoom-out').addEventListener('click', () => zoom(1.25));
+
+function resize() {
+  const w = container.clientWidth, h = container.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize);
+resize();
+
+// Only render while the viewer is on screen
+let visible = true;
+new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(container);
+renderer.setAnimationLoop(() => {
+  if (!visible) return;
+  controls.update();
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

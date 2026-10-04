@@ -1,0 +1,126 @@
+{
+ "models": [
+  {
+   "id": "asl",
+   "file": "model_fp32.onnx",
+   "n_classes": 250,
+   "name": "ASL (Google ISLR)",
+   "short": "ASL",
+   "language": "American Sign Language",
+   "citation": "Google ISLR, Kaggle 2023",
+   "dictionary": "https://www.signasl.org/sign/{gloss}",
+   "easy": [
+    {
+     "label": "clown",
+     "acc": 0.987
+    },
+    {
+     "label": "flower",
+     "acc": 0.973
+    },
+    {
+     "label": "owl",
+     "acc": 0.96
+    },
+    {
+     "label": "bug",
+     "acc": 0.948
+    },
+    {
+     "label": "aunt",
+     "acc": 0.935
+    },
+    {
+     "label": "tomorrow",
+     "acc": 0.935
+    },
+    {
+     "label": "first",
+     "acc": 0.932
+    },
+    {
+     "label": "if",
+     "acc": 0.926
+    },
+    {
+     "label": "police",
+     "acc": 0.918
+    },
+    {
+     "label": "home",
+     "acc": 0.915
+    },
+    {
+     "label": "pig",
+     "acc": 0.909
+    },
+    {
+     "label": "now",
+     "acc": 0.905
+    }
+   ]
+  },
+  {
+   "id": "lsfb",
+   "file": "model_fp32.onnx",
+   "n_classes": 100,
+   "name": "LSFB (LSFB-ISOL)",
+   "short": "LSFB",
+   "language": "French Belgian Sign Language",
+   "citation": "Fink et al., IJCNN 2021",
+   "dictionary": null,
+   "examples": "examples/lsfb.json",
+   "note": "Glosses of the LSFB corpus (University of Namur).",
+   "easy": [
+    {
+     "label": "COMMUNICATION",
+     "acc": 0.944
+    },
+    {
+     "label": "INTERPRETE",
+     "acc": 0.935
+    },
+    {
+     "label": "DIFFERENT",
+     "acc": 0.925
+    },
+    {
+     "label": "RENCONTRER",
+     "acc": 0.915
+    },
+    {
+     "label": "AUSSI",
+     "acc": 0.904
+    },
+    {
+     "label": "LS",
+     "acc": 0.893
+    },
+    {
+     "label": "C-EST",
+     "acc": 0.882
+    },
+    {
+     "label": "COMMENCER",
+     "acc": 0.875
+    },
+    {
+     "label": "AVANCER",
+     "acc": 0.869
+    },
+    {
+     "label": "ECOLE",
+     "acc": 0.867
+    },
+    {
+     "label": "VRAI",
+     "acc": 0.844
+    },
+    {
+     "label": "AVANT",
+     "acc": 0.842
+    }
+   ]
+  }
+ ]
+}

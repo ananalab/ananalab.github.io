@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BirdCLEF recordings map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ocean: #E6ECE9; --land: #FAFCFB; --border: #C9D3CF; --ink: #111A18; --muted: #55635E;
+    --panel: rgba(250,252,251,.92); --line: #CFD8D4; --accent: #12776C; --box: #D9622B;
+    --c0: #12776C; --c1: #D9622B; --c2: #B58A00; --c3: #7353C9; --c4: #C2417A;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ocean: #101615; --land: #1C2523; --border: #2E3A37; --ink: #E3EAE7; --muted: #97A59F;
+      --panel: rgba(20,27,26,.9); --line: #28332F; --accent: #5EC4B5; --box: #F08A55;
+      --c0: #5EC4B5; --c1: #F08A55; --c2: #E3B53C; --c3: #A58BF0; --c4: #EE7BAE;
+    }
+  }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--ocean);
+    font: 12px/1.4 var(--mono); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: pan-x pan-y; }
+  canvas.dragging { cursor: grabbing; }
+  .panel { position: fixed; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  #legend { top: 10px; left: 10px; padding: 8px 10px; display: grid; gap: 2px; }
+  #legend .head { color: var(--muted); margin-bottom: 4px; }
+  #legend button { all: unset; display: flex; align-items: center; gap: 8px; padding: 2px 4px; margin: 0 -4px;
+    border-radius: 6px; cursor: pointer; white-space: nowrap; }
+  #legend button:hover { background: var(--line); }
+  #legend button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  #legend button[aria-pressed="false"] { color: var(--muted); }
+  #legend button[aria-pressed="false"] i { background: transparent !important; }
+  #legend i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid; flex: none; }
+  #legend .n { margin-left: auto; padding-left: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  #controls { right: 10px; bottom: 10px; display: grid; gap: 4px; padding: 4px; }
+  #controls button { all: unset; box-sizing: border-box; min-width: 28px; height: 28px; padding: 0 8px; border-radius: 6px;
+    display: grid; place-items: center; cursor: pointer; color: var(--ink); font: 500 14px/1 var(--mono); }
+  #controls button.txt { font-size: 11px; }
+  #controls button:hover { background: var(--line); }
+  #controls button:focus-visible { outline: 2px solid var(--accent); }
+  #hint { left: 10px; bottom: 10px; padding: 5px 9px; color: var(--muted); font-size: 11px; }
+  #tip { position: fixed; pointer-events: none; padding: 6px 9px; max-width: 240px; opacity: 0; transition: opacity .12s; }
+  #tip b { font-weight: 500; display: block; }
+  #tip span { color: var(--muted); font-size: 11px; display: block; }
+  #toast { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 8px 14px; opacity: 0;
+    transition: opacity .2s; pointer-events: none; }
+  #msg { position: fixed; inset: 0; display: grid; place-items: center; color: var(--muted); pointer-events: none; }
+  @media (max-width: 520px) {
+    #legend { font-size: 10px; padding: 5px 8px; grid-template-columns: auto auto auto; column-gap: 10px; right: 10px; }
+    #legend .head, #legend .n { display: none; }
+    #legend i { width: 7px; height: 7px; }
+    #controls { display: flex; padding: 3px; }
+    #controls button { min-width: 26px; height: 26px; padding: 0 6px; }
+    #hint { display: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="map" aria-label="Interactive world map of the BirdCLEF focal recordings, coloured by taxonomic class"></canvas>
+<div id="legend" class="panel" role="group" aria-label="Taxonomic classes"><div class="head">35,549 focal recordings</div></div>
+<div id="controls" class="panel">
+  <button type="button" id="zin" aria-label="Zoom in" title="Zoom in">+</button>
+  <button type="button" id="zout" aria-label="Zoom out" title="Zoom out">−</button>
+  <button type="button" id="pantanal" class="txt" title="Zoom on the Pantanal">Pantanal</button>
+  <button type="button" id="world" class="txt" title="Show the whole world">World</button>
+</div>
+<div id="hint" class="panel"></div>
+<div id="tip" class="panel" role="status"></div>
+<div id="toast" class="panel"></div>
+<div id="msg">Loading the map…</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="data.js"></script>
+<script>
+(() => {
+  const msg = document.getElementById("msg");
+  if (!window.d3 || !window.BIRDCLEF_MAP) { msg.textContent = "Could not load the map"; return; }
+  msg.remove();
+  const D = window.BIRDCLEF_MAP;
+  const NAMES = ["Birds", "Amphibians", "Insects", "Mammals", "Reptiles"];
+  const SING = ["bird", "amphibian", "insect", "mammal", "reptile"];
+  const canvas = document.getElementById("map"), ctx = canvas.getContext("2d");
+  const tip = document.getElementById("tip"), toast = document.getElementById("toast");
+  const touch = matchMedia("(pointer: coarse)").matches;
+  const mac = /Mac|iPhone|iPad/.test(navigator.platform);
+  document.getElementById("hint").textContent = touch
+    ? "Pinch to zoom · two fingers to move"
+    : `${mac ? "⌘" : "Ctrl"} + scroll or pinch to zoom · drag to move · hover a point`;
+  if (touch) document.getElementById("hint").textContent += " · tap a point";
+
+  // colours follow the theme
+  let C = {};
+  const readColors = () => {
+    const cs = getComputedStyle(document.documentElement), g = n => cs.getPropertyValue(n).trim();
+    C = { land: g("--land"), border: g("--border"), box: g("--box"), ink: g("--ink"), ocean: g("--ocean"),
+          cls: [0, 1, 2, 3, 4].map(i => g(`--c${i}`)) };
+  };
+  readColors();
+
+  // legend with per-class toggles
+  const N = D.pts.length / 3, counts = [0, 0, 0, 0, 0];
+  for (let i = 0; i < N; i++) counts[D.species[D.pts[i * 3 + 2]][2]]++;
+  const visible = [true, true, true, true, true];
+  const legend = document.getElementById("legend");
+  NAMES.forEach((name, c) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.setAttribute("aria-pressed", "true");
+    b.innerHTML = `<i style="border-color:var(--c${c});background:var(--c${c})"></i>${name}<span class="n">${counts[c].toLocaleString("en")}</span>`;
+    b.onclick = () => { visible[c] = !visible[c]; b.setAttribute("aria-pressed", visible[c]); hideTip(); draw(); };
+    legend.appendChild(b);
+  });
+
+  // projection: points and land are projected once per resize, then drawn under the zoom transform
+  const proj = d3.geoNaturalEarth1();
+  const extent = { type: "Polygon", coordinates: [[[-180, -57], [180, -57], [180, 80], [-180, 80], [-180, -57]]] };
+  let W = 0, H = 0, dpr = 1, base = null, landPath = null, boxPx = null, tree = null, t = d3.zoomIdentity;
+  const zoom = d3.zoom().scaleExtent([1, 80])
+    .filter(e => e.type === "wheel" ? (e.ctrlKey || e.metaKey) : e.type.startsWith("touch") ? e.touches.length > 1 : !e.button)
+    .on("start", () => canvas.classList.add("dragging"))
+    .on("zoom", e => { t = e.transform; hideTip(); draw(); })
+    .on("end", () => canvas.classList.remove("dragging"));
+
+  function layout() {
+    W = innerWidth; H = innerHeight; dpr = Math.min(devicePixelRatio || 1, 2);
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    proj.fitExtent([[8, 8], [W - 8, H - 8]], extent);
+    base = new Float32Array(N * 2);
+    for (let i = 0; i < N; i++) {
+      const p = proj([D.pts[i * 3], D.pts[i * 3 + 1]]);
+      base[i * 2] = p[0]; base[i * 2 + 1] = p[1];
+    }
+    landPath = new Path2D();
+    D.land.forEach(ring => ring.forEach((ll, j) => { const p = proj(ll); j ? landPath.lineTo(p[0], p[1]) : landPath.moveTo(p[0], p[1]); }));
+    const [x0, y0, x1, y1] = D.pantanal, a = proj([x0, y1]), b = proj([x1, y0]);
+    boxPx = [a[0], a[1], b[0], b[1]];
+    tree = d3.quadtree().x(i => base[i * 2]).y(i => base[i * 2 + 1]).addAll(d3.range(N));
+    zoom.extent([[0, 0], [W, H]]).translateExtent([[0, 0], [W, H]]);
+    d3.select(canvas).call(zoom);
+    draw();
+  }
+
+  function draw() {
+    if (!base) return;
+    const k = t.k;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = C.ocean; ctx.fillRect(0, 0, W, H);
+    ctx.setTransform(dpr * k, 0, 0, dpr * k, dpr * t.x, dpr * t.y);
+    ctx.fillStyle = C.land; ctx.fill(landPath);
+    ctx.strokeStyle = C.border; ctx.lineWidth = 0.7 / k; ctx.stroke(landPath);
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const r = Math.min(4.5, 1.35 * Math.pow(k, 0.42));
+    ctx.globalAlpha = Math.min(0.9, 0.58 + 0.04 * k);
+    for (let c = 0; c < 5; c++) {
+      if (!visible[c]) continue;
+      ctx.fillStyle = C.cls[c]; ctx.beginPath();
+      for (let i = 0; i < N; i++) {
+        if (D.species[D.pts[i * 3 + 2]][2] !== c) continue;
+        const x = base[i * 2] * k + t.x, y = base[i * 2 + 1] * k + t.y;
+        if (x < -r || y < -r || x > W + r || y > H + r) continue;
+        ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, Math.PI * 2);
+      }
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // the Pantanal, where the field soundscapes were recorded
+    const bx = boxPx[0] * k + t.x, by = boxPx[1] * k + t.y, bw = (boxPx[2] - boxPx[0]) * k, bh = (boxPx[3] - boxPx[1]) * k;
+    const pad = Math.max(0, 6 - Math.min(bw, bh) / 2);
+    ctx.strokeStyle = C.box; ctx.lineWidth = 1.8;
+    ctx.strokeRect(bx - pad, by - pad, bw + pad * 2, bh + pad * 2);
+    ctx.font = `500 11px ${getComputedStyle(document.body).fontFamily}`;
+    ctx.textBaseline = "top"; ctx.textAlign = "left";
+    const label = "Pantanal · 2.4% of recordings", tw = ctx.measureText(label).width, ly = by - pad;
+    let lx = bx + bw + pad + 6;
+    if (lx + tw > W - 8) lx = Math.max(8, bx - pad - 6 - tw);
+    ctx.lineWidth = 3; ctx.strokeStyle = C.ocean; ctx.lineJoin = "round"; ctx.strokeText(label, lx, ly);
+    ctx.fillStyle = C.box; ctx.fillText(label, lx, ly);
+  }
+
+  // hover / tap: nearest recording, and how many share the spot
+  function hideTip() { tip.style.opacity = 0; }
+  function pick(px, py) {
+    const [x, y] = t.invert([px, py]), rad = 9 / t.k;
+    let best = null, bd = rad * rad, near = 0;
+    tree.visit((node, x0, y0, x1, y1) => {
+      if (!node.length) do {
+        const i = node.data; if (!visible[D.species[D.pts[i * 3 + 2]][2]]) continue;
+        const dx = base[i * 2] - x, dy = base[i * 2 + 1] - y, d = dx * dx + dy * dy;
+        if (d < rad * rad) near++;
+        if (d < bd) { bd = d; best = i; }
+      } while ((node = node.next));
+      return x0 > x + rad || x1 < x - rad || y0 > y + rad || y1 < y - rad;
+    });
+    if (best === null) return hideTip();
+    const [common, sci, c] = D.species[D.pts[best * 3 + 2]];
+    tip.innerHTML = `<b>${common}</b><span>${sci} · ${SING[c]}</span>` +
+      (near > 1 ? `<span>${near} recordings around this point</span>` : "");
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    tip.style.left = Math.min(W - tw - 6, px + 14) + "px";
+    tip.style.top = Math.max(6, Math.min(H - th - 6, py - th - 10)) + "px";
+    tip.style.opacity = 1;
+  }
+  canvas.addEventListener("pointermove", e => { if (!e.buttons) pick(e.offsetX, e.offsetY); });
+  canvas.addEventListener("pointerleave", hideTip);
+  canvas.addEventListener("click", e => pick(e.offsetX, e.offsetY));
+
+  // plain scrolling stays with the page; explain how to zoom instead
+  let toastTimer = 0;
+  canvas.addEventListener("wheel", e => {
+    if (e.ctrlKey || e.metaKey) return;
+    toast.textContent = `Hold ${mac ? "⌘" : "Ctrl"} while scrolling to zoom`;
+    toast.style.opacity = 1; clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.style.opacity = 0, 1100);
+  }, { passive: true });
+
+  const sel = () => d3.select(canvas).transition().duration(450);
+  document.getElementById("zin").onclick = () => sel().call(zoom.scaleBy, 2);
+  document.getElementById("zout").onclick = () => sel().call(zoom.scaleBy, 0.5);
+  document.getElementById("world").onclick = () => sel().call(zoom.transform, d3.zoomIdentity);
+  document.getElementById("pantanal").onclick = () => {
+    const cx = (boxPx[0] + boxPx[2]) / 2, cy = (boxPx[1] + boxPx[3]) / 2;
+    const k = Math.min(30, 0.45 * Math.min(W / (boxPx[2] - boxPx[0]), H / (boxPx[3] - boxPx[1])));
+    d3.select(canvas).transition().duration(900)
+      .call(zoom.transform, d3.zoomIdentity.translate(W / 2, H / 2).scale(k).translate(-cx, -cy));
+  };
+
+  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => { readColors(); draw(); });
+  let rt = 0;
+  addEventListener("resize", () => { cancelAnimationFrame(rt); rt = requestAnimationFrame(() => { t = d3.zoomIdentity; layout(); d3.select(canvas).call(zoom.transform, t); }); });
+  document.fonts?.ready.then(draw);
+  layout();
+})();
+</script>
+</body>
+</html>

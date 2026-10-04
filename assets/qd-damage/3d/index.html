@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ant in 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root { --bg: #FAFCFB; --ink: #111A18; --muted: #55635E; --line: #CFD8D4; --accent: #12776C; --on-accent: #F4FBF9;
+          --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141B1A; --ink: #E3EAE7; --muted: #97A59F; --line: #28332F; --accent: #5EC4B5; --on-accent: #0B1513; }
+  }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 12px/1.4 var(--mono); }
+  body { display: grid; grid-template-rows: auto minmax(0, 1fr); }
+  nav { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border-bottom: 1px solid var(--line); }
+  nav button { all: unset; cursor: pointer; padding: 5px 11px; border: 1px solid var(--line); border-radius: 999px;
+    color: var(--muted); white-space: nowrap; }
+  nav button:hover { color: var(--ink); border-color: var(--muted); }
+  nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  nav button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  iframe { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
+</style>
+</head>
+<body>
+<nav role="tablist" aria-label="Simulated episodes">
+  <button type="button" role="tab" data-src="intact.html" aria-selected="true">1 · intact</button>
+  <button type="button" role="tab" data-src="damaged.html" aria-selected="false">2 · damaged, same gait</button>
+  <button type="button" role="tab" data-src="after-ite.html" aria-selected="false">3 · after ITE</button>
+</nav>
+<iframe id="view" src="intact.html" title="Interactive 3D replay of the simulated Ant"></iframe>
+<script>
+  const view = document.getElementById("view"), tabs = document.querySelectorAll("nav button");
+  tabs.forEach(b => b.addEventListener("click", () => {
+    tabs.forEach(t => t.setAttribute("aria-selected", t === b));
+    view.src = b.dataset.src;
+  }));
+</script>
+</body>
+</html>

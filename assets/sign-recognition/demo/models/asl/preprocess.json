@@ -1,0 +1,16 @@
+{
+ "T": 64,
+ "length_mode": "resample",
+ "use_z": false,
+ "parts": [
+  "left_hand",
+  "right_hand",
+  "pose",
+  "lips"
+ ],
+ "trim": true,
+ "canonical_hand": true,
+ "hand_local": true,
+ "velocity": true,
+ "min_shoulder_width": 0.02
+}

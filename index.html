@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Research portfolio: robot learning, evolutionary methods and interpretable AI.">
+<meta name="robots" content="noindex, nofollow">
+<title>Anaïs Azouaoui · Research portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400..500&display=swap">
+<style>
+/* Layout: a short left-aligned intro (availability, name, one-paragraph bio, links), then the project archive:
+   one featured full-width card over a two-column grid. Each card opens its own page at #project-id. */
+:root{
+  --bg:#EEF2F0;
+  --surface:#FAFCFB;
+  --sunk:#E2E8E5;
+  --ink:#111A18;
+  --muted:#55635E;
+  --line:#CFD8D4;
+  --accent:#12776C;
+  --accent-soft:#D5ECE7;
+  --on-accent:#F4FBF9;
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --serif:"Source Serif 4",Charter,Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --radius:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1211; --surface:#141B1A; --sunk:#1A2321; --ink:#E3EAE7; --muted:#97A59F; --line:#28332F;
+    --accent:#5EC4B5; --accent-soft:#16312D; --on-accent:#0B1513;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1211; --surface:#141B1A; --sunk:#1A2321; --ink:#E3EAE7; --muted:#97A59F; --line:#28332F;
+  --accent:#5EC4B5; --accent-soft:#16312D; --on-accent:#0B1513;
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+@media (min-width:900px){#home{zoom:.9}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:16.5px;line-height:1.58;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.wrap{max-width:1080px;margin-inline:auto;padding-inline:clamp(16px,4vw,40px);padding-block:clamp(28px,6vw,72px) 40px}
+a{color:inherit;text-underline-offset:.18em}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+p{margin:0}
+strong{font-weight:600}
+
+/* Intro */
+.intro{display:grid;gap:40px}
+.intro-main{display:grid;gap:18px;min-width:0}
+@media (min-width:980px){.intro{grid-template-columns:minmax(0,1fr) 320px;gap:56px;align-items:start}}
+.pubs{display:grid;gap:12px;align-self:center}
+.photo{flex:none;width:clamp(64px,9vw,92px);aspect-ratio:1;border-radius:50%;overflow:hidden;background:var(--sunk)}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.pubs h2{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0}
+.pubs h2 span{color:var(--accent);margin-left:6px}
+.pub{display:grid;gap:6px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s}
+.pub:hover{border-color:var(--accent)}
+.pub-title{font-size:15px;line-height:1.35;font-weight:500}
+.pub-authors{font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.45}
+.pub-authors b{color:var(--ink);font-weight:500}
+.avail{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--muted);letter-spacing:.02em}
+.avail .dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);animation:ping 2.4s ease-out infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}70%,100%{box-shadow:0 0 0 7px transparent}}
+.id{display:flex;align-items:center;gap:18px}
+.id > div{min-width:0}
+.name{font-size:clamp(2.3rem,6.5vw,3.9rem);font-weight:720;font-stretch:82%;letter-spacing:-.025em;line-height:.95}
+.role{font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:10px;letter-spacing:.01em}
+.bio{font-size:clamp(1.05rem,1.8vw,1.2rem);line-height:1.55;max-width:77ch}
+.interests{display:flex;flex-wrap:wrap;gap:4px 14px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.interests b{font-weight:500;color:var(--ink)}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:13px;font-weight:500;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s,background-color .15s}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+
+/* Project grid */
+.projects{margin-top:clamp(44px,7vw,76px)}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.sec-head h2{font-size:1.3rem;font-weight:650;font-stretch:90%}
+.sec-head span{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;text-decoration:none;color:inherit;transition:border-color .2s}
+.card:hover{border-color:var(--accent)}
+.card:hover .thumb > *{transform:scale(1.025)}
+.thumb{position:relative;aspect-ratio:16/10;max-width:100%;background:var(--sunk);overflow:hidden}
+.thumb > canvas,.thumb > img,.thumb > video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.thumb > .clips{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;gap:1px;background:#fff;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.clips video{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.card-body{display:flex;flex-direction:column;gap:10px;padding:18px 20px 20px;flex:1;min-width:0}
+.meta{font-family:var(--mono);font-size:11.5px;line-height:1.7;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.meta > span + span{margin-left:.5em}
+.pill{display:inline-block;background:var(--accent-soft);color:var(--accent);padding:0 8px;border-radius:999px;letter-spacing:.03em;margin-right:.3em}
+.card h3{font-size:1.3rem;font-weight:650;font-stretch:88%;line-height:1.15;letter-spacing:-.01em}
+.blurb{color:var(--muted);font-size:15.5px;line-height:1.5}
+.tags{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.tags li{font-family:var(--mono);font-size:11.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+.more{margin-top:auto;padding-top:4px;font-family:var(--mono);font-size:12.5px;font-weight:500;color:var(--ink);transition:color .15s}
+.card:hover .more{color:var(--accent)}
+.card.featured{grid-column:1/-1}
+@media (min-width:760px){
+  .card.featured{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+  .card.featured .thumb{aspect-ratio:auto;min-height:345px}.card.featured .thumb > img{object-position:50% 0}
+  .card.featured .card-body{padding:28px 30px;justify-content:center;gap:12px}
+  .card.featured h3{font-size:clamp(1.6rem,2.6vw,2.1rem)}
+  .card.featured .blurb{font-size:16.5px}
+  .card.featured .more{margin-top:8px}
+}
+@media (max-width:680px){.grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Project page */
+.d-top{display:flex;justify-content:space-between;gap:16px;margin-bottom:28px}
+.d-step{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 22px}
+.back{display:inline-flex;gap:6px;font-family:var(--mono);font-size:13px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent)}
+.d-head{display:grid;gap:28px}
+.d-title{display:grid;gap:14px;max-width:780px;align-content:start}
+.d-head h1{font-size:clamp(2rem,5.2vw,3.3rem);font-weight:720;font-stretch:84%;letter-spacing:-.008em;line-height:1}
+.glance{display:grid;gap:22px;align-content:start;padding-top:20px;border-top:1px solid var(--line)}
+@media (min-width:860px){.d-head{grid-template-columns:minmax(0,1fr) 300px;gap:56px;align-items:start}.glance{padding:0;border-top:0}}
+.g-links{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.g-links a{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border:1px solid var(--line);border-radius:999px;color:var(--ink);text-decoration:none;font-family:var(--mono);font-size:12.5px;font-weight:500;transition:border-color .15s}
+.g-links a:hover{border-color:var(--accent)}
+.g-links svg{width:14px;height:14px;flex:none;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.d-head h1:focus{outline:none}
+.lead{font-size:clamp(1.08rem,2vw,1.25rem);max-width:62ch}
+.hero{margin:32px 0 0;display:grid;gap:10px}
+.hero .thumb{border-radius:var(--radius);border:1px solid var(--line);aspect-ratio:16/8}
+.hero figcaption{font-size:14px}
+.scenes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.scene{display:grid;gap:6px;min-width:0}
+.scene-label{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.scene-view{position:relative;aspect-ratio:4/3;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#a0a0a0}
+.scene-view iframe{display:block;width:100%;height:100%;border:0;color-scheme:normal}
+.scene-in{position:absolute;left:10px;top:10px;pointer-events:none;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+img.scene-in{width:28%;height:auto;aspect-ratio:4/3;object-fit:cover;border:2px solid #fff}
+p.scene-in{max-width:42%;margin:0;padding:6px 9px;background:rgba(255,255,255,.88);color:#1d2421;font-size:12px;line-height:1.35}
+@media (max-width:680px){.scenes{grid-template-columns:minmax(0,1fr)}}
+.shot{margin:4px 0 0;display:grid;gap:8px;max-width:66ch}
+.shot a{display:block;cursor:zoom-in}
+.shot img{display:block;width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+.shot.narrow{max-width:400px}
+.shot.wide{max-width:none}
+.shot.medium{max-width:480px}
+.vids{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.vid{margin:0;display:grid;gap:6px;min-width:0}
+.vid video{display:block;width:100%;aspect-ratio:640/434;object-fit:cover;border:1px solid var(--line);border-radius:var(--radius);background:#fff}
+.vid figcaption{display:grid;gap:1px;font-family:var(--mono);font-size:12px;line-height:1.4}
+.vid figcaption b{font-weight:500;color:var(--ink)}
+.vid figcaption span{color:var(--muted)}
+.sim-view{position:relative;aspect-ratio:16/10;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface);max-width:66ch}
+.sim-view iframe{display:block;width:100%;height:100%;border:0;color-scheme:normal}
+.vids.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.vids.four video{aspect-ratio:1/1}
+@media (max-width:680px){.vids{grid-template-columns:minmax(0,1fr)}.vids.four{grid-template-columns:repeat(2,minmax(0,1fr))}.sim-view{aspect-ratio:4/5}}
+.shots2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.shots2 .shot{max-width:none}
+@media (max-width:680px){.shots2{grid-template-columns:minmax(0,1fr)}}
+.tbl-wrap{max-width:66ch;overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:15px;line-height:1.4}
+.tbl th{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:0 12px 8px 0;border-bottom:1px solid var(--line)}
+.tbl td{padding:7px 12px 7px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl tr.grp td{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);padding-top:16px}
+.tbl caption{caption-side:bottom;text-align:left;font-size:14px;color:var(--muted);padding-top:8px}
+.map-view{position:relative;aspect-ratio:16/8;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--sunk)}
+.map-view iframe{display:block;width:100%;height:100%;border:0;color-scheme:normal}
+@media (max-width:680px){.map-view{aspect-ratio:1/1}}
+.shot figcaption{font-size:14px;color:var(--muted);line-height:1.45}
+.ext{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px}
+.d-body{display:grid;gap:32px;margin-top:40px}
+.d-aside{display:grid;gap:22px;min-width:0;align-content:start}
+.d-main{display:grid;gap:34px;min-width:0;align-content:start}
+@media (min-width:860px){
+  .d-body{grid-template-columns:minmax(0,1fr) 270px;gap:56px}
+  .d-aside{grid-column:2;grid-row:1;position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start}
+  .d-main{grid-column:1;grid-row:1}
+}
+.facts{margin:0;display:grid;gap:14px;padding:18px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.facts div{display:grid;gap:2px}
+.facts dt,.mini{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.facts dd{margin:0;font-size:15px;line-height:1.4}
+.mini{margin-bottom:8px}
+.d-links{display:flex;flex-wrap:wrap;gap:8px}
+.d-main section{display:grid;gap:12px}
+.d-main h2{font-size:1.25rem;font-weight:650;font-stretch:90%}
+.d-main p,.d-main li{max-width:66ch}
+.d-main ul{margin:0;padding-left:1.1em;display:grid;gap:8px}
+.d-main li::marker{color:var(--accent)}
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.fig{border-top:2px solid var(--accent);padding-top:10px;display:grid;gap:6px;align-content:start}
+.fig b{font-family:var(--display);font-size:2.1rem;font-weight:700;font-stretch:85%;font-variant-numeric:tabular-nums;line-height:1}
+.fig span{font-size:14.5px;color:var(--muted);line-height:1.4}
+.pn{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:56px;padding-top:20px;border-top:1px solid var(--line)}
+.pn a{display:grid;gap:4px;text-decoration:none;padding-block:12px;min-width:0}
+.pn a:last-child{text-align:right}
+.pn small{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.pn span{font-family:var(--display);font-weight:600;font-size:1.05rem;font-stretch:90%;line-height:1.25}
+.pn a:hover span{color:var(--accent)}
+
+footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .card:hover .thumb > *{transform:none}
+}
+[hidden]{display:none!important}
+img{max-width:100%}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <main id="home">
+    <header class="intro" id="intro"></header>
+    <section class="projects" id="projects" aria-labelledby="projects-title">
+      <div class="sec-head"><h2 id="projects-title">Projects</h2><span id="count"></span></div>
+      <div class="grid" id="grid"></div>
+    </section>
+  </main>
+  <main id="detail" hidden></main>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const PROFILE = {
+  name: "Anaïs Azouaoui",
+  available: "Seeking a 6-month research internship · from March 2027",
+  role: "Second-year Master's student in Algorithms, Artificial Intelligence, Interactions & Decision (AI2D) · Sorbonne Université, Paris",
+  bio: "I am a Master's student in AI and robotics at Sorbonne Université, working on how robots can learn and adapt, with evolutionary methods, Quality-Diversity and deep reinforcement learning. Recently, I have worked on turning text and photos into simulation-ready 3D scenes with language models, on damage recovery for a legged robot with Quality-Diversity and deep RL, and on interpretable machine learning for intensive care.",
+  interests: ["Quality-Diversity", "Evolutionary robotics", "LLM-guided evolutionary search", "Robot learning", "Reinforcement learning", "Deep RL", "Imitation learning"],
+  links: [
+    { label: "CV (PDF)", url: "assets/cv-anais-azouaoui.pdf" },
+    { label: "Email", url: "mailto:anais.azouaoui12@gmail.com" },
+    { label: "GitHub", url: "https://github.com/ananalab" }
+  ],
+  photo: "assets/profile.jpg",
+  publications: [
+    { title: "Real-to-Sim: generating physically valid robot simulation scenes from text and images with LLMs and VLMs",
+      authors: "A. Azouaoui, C. Zouloumian, E. Garrabé, S. Doncieux", project: "real-to-sim" },
+    { title: "Interpretable prediction of clinician-rated respiratory severity in intensive care with genetic programming",
+      authors: "A. Azouaoui, G. Nadizar, S. Cussat-Blanc, D. Wilson, M. Poette", project: "icu-risk" }
+  ],
+  updated: "October 2026"
+};
+
+const PROJECTS = [
+  {
+    id: "real-to-sim",
+    featured: true,
+    title: "Real-to-Sim",
+    year: "2026",
+    context: "Research project · ISIR",
+    status: "done",
+    blurb: "A pipeline that turns a prompt or an RGB photo into a physically consistent 3D scene for the Genesis simulator using LLMs and VLMs, checked by a physics and semantic validation loop.",
+    art: "scene",
+    media: { src: "assets/real-to-sim-thumb.jpg", alt: "Left, a photo taken by the Franka robot camera; right, the same scene rebuilt by the pipeline in the Genesis simulator." },
+    hero: {
+      html: `<div class="scenes">
+        <div class="scene"><span class="scene-label">From a photo · Franka camera</span>
+          <div class="scene-view"><iframe src="assets/scenes/viewer.html?scene=photo" title="Interactive 3D view of the scene rebuilt from the photo" loading="lazy"></iframe>
+            <img class="scene-in" src="assets/real-to-sim-photo.jpg" alt="Input photo: a can, scissors and a screwdriver on a plastic box."></div></div>
+        <div class="scene"><span class="scene-label">From a prompt</span>
+          <div class="scene-view"><iframe src="assets/scenes/viewer.html?scene=prompt" title="Interactive 3D view of the scene generated from the prompt" loading="lazy"></iframe>
+            <p class="scene-in">“I want a banana and a mug on a washing machine”</p></div></div>
+      </div>`,
+      caption: "Two scenes generated by the pipeline and simulated in Genesis, with no human intervention: one from an RGB photo taken by the Franka's camera (inset), the other from a prompt. This is the point of bridging the real-to-sim gap: done at scale, it could save hundreds of hours for teams that build simulation environments by hand for robot training."
+    },
+    tags: ["Robotics", "LLMs", "Simulation", "Franka Panda"],
+    tools: ["Python", "Genesis", "Phi-3-mini (QLoRA)", "Ollama", "GPT-4o", "Llama 3.1", "GroundingDINO", "multilingual-e5"],
+    keywords: ["Real-to-sim", "Scene generation", "LLM", "VLM", "QLoRA fine-tuning", "Physics-based validation", "Open-vocabulary detection", "Spatial relations", "Phi-3", "Genesis"],
+    facts: [
+      ["Team", "Pair project, with Caroline Zouloumian"],
+      ["Period", "Feb – Apr 2026"],
+      ["Supervision", `<a class="ext" href="https://scholar.google.com/citations?user=K7tt_7QAAAAJ&hl=en" target="_blank" rel="noopener">Prof. Stéphane Doncieux</a>, director of the <a class="ext" href="https://www.isir.upmc.fr/" target="_blank" rel="noopener">Institut des Systèmes Intelligents et de Robotique</a><br><a class="ext" href="https://www.isir.upmc.fr/personnel/garrabe/" target="_blank" rel="noopener">Dr. Emiland Garrabé</a>, postdoctoral researcher`],
+      ["Robot", "Franka Emika Panda, ISIR"],
+      ["Simulator", "Genesis"]
+    ],
+    sections: [
+      { h: "Goal", html: `<p>Robot learning often happens in simulation, and simulation needs scenes that match the real world. This project builds them automatically: from a prompt describing a tabletop, or from a photo of it, the pipeline produces a 3D scene that the Genesis physics simulator can load and run.</p><p>Since it runs with no human intervention, it can generate many varied scenes for training robots, with reinforcement learning or other methods.</p>` },
+      { h: "How it works", html: `<ul>
+        <li><strong>Text pipelines.</strong> A language model extracts the objects, their spatial relations and their orientations. Later versions add geometric primitives and a fine-tuned Phi-3 that runs locally.</li>
+        <li><strong>Image pipelines.</strong> Objects are recognised in a single RGB image and placed in 3D.</li>
+        <li><strong>Validation loop.</strong> Each scene runs for 150 simulation steps in Genesis to catch physical violations, then GPT-4o checks it against multi-view renders. The scene is corrected and re-checked, up to 10 times.</li>
+      </ul>
+      <figure class="shot">
+        <a href="assets/real-to-sim-architecture.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/real-to-sim-architecture.png" alt="Diagram: user input goes to a text or image pipeline, then a JSON representation, geometric construction, a validation loop that sends corrections back, and finally a simulable Genesis scene." loading="lazy"></a>
+        <figcaption>Overall architecture, from the report (translated into English). Both pipelines produce the same JSON of objects, relations and orientations, which is turned into geometry and then checked by the validation loop.</figcaption>
+      </figure>` },
+      { h: "Evaluation", html: `<ul>
+        <li>30 hand-annotated prompts, each with the expected objects, relations and orientations.</li>
+        <li>A 177-example test set for the fine-tuned model, including objects never seen in training.</li>
+        <li>7 RGB images captured with ISIR's Franka Emika Panda, with ground-truth 6D poses from the robot.</li>
+        <li>A user study: 35 people rated 27 generated scenes for fidelity to the prompt and physical coherence.</li>
+      </ul>` },
+      { h: "Results", html: `<div class="figs">
+          <div class="fig"><b>87.8%</b><span>object-recognition F1 on the 30 prompts with the local fine-tuned Phi-3, against 83.6% for GPT-4o</span></div>
+          <div class="fig"><b>71.9%</b><span>spatial-relation F1 with the fine-tuned Phi-3, against 56.3% for the best GPT-4o pipeline</span></div>
+          <div class="fig"><b>9.8 s</b><span>per scene from a prompt, fully local on a MacBook (Apple Silicon, 8 GB RAM, CPU only), against about 140 s with Llama 3.1</span></div>
+          <div class="fig"><b>0.48 m</b><span>mean 3D position error of the image pipeline on the Franka photos, down from 1.25 m</span></div>
+        </div>
+        <p>The validation loop repairs the worst scenes, removing collisions and restoring missing relations, and lifts the average placement score from 91.1% to 92.9%. It converges on only 43% of prompts, though, and sometimes breaks scenes that were already right. Orientations remain the weak point.</p>` },
+      { h: "My contribution", html: `<p>I built the pipeline from the input up to the finished scene, before the validation loop:</p>
+      <ul>
+        <li><strong>Architecture and object library.</strong> I designed the overall pipeline around an intermediate JSON (objects, relations, orientations) and assembled the 28-object catalogue from YCB and PartNet-Mobility.</li>
+        <li><strong>Text pipeline, V1 to V2.</strong> It went from a single LLM call that guessed coordinates, to symbolic extraction, to catalogue matching with multilingual-e5 embeddings. The final version is Phi-3-mini fine-tuned with QLoRA on 3,531 synthetic examples and served locally through Ollama. To build the dataset, the JSON target is generated first, then paraphrased by GPT-4.1-mini and checked.</li>
+        <li><strong>Image pipeline, V3 and V3.1.</strong> GPT-4o recognises the objects and their relations, GroundingDINO refines their bounding boxes, and the image coordinates are projected into the 3D world: orthographically, or by pinhole back-projection when a depth map is available.</li>
+        <li><strong>Scene construction.</strong> Rotations as quaternions, dimensions measured from Genesis bounding boxes after rotation, and a scene graph that propagates parent links, so a banana placed next to a mug that sits on a washing machine stays on the machine. Each relation is then applied geometrically, with children kept within their parent's surface.</li>
+      </ul>
+      <figure class="shot">
+        <a href="assets/real-to-sim-image-pipeline.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/real-to-sim-image-pipeline.png" alt="Image pipeline: RGB photo, GPT-4o semantic extraction, GroundingDINO bounding boxes, embedding-based catalogue matching, 3D projection, vertical placement, final Genesis scene." loading="lazy"></a>
+        <figcaption>Image pipeline V3.1, from the report (translated into English). GPT-4o names the objects, GroundingDINO locates them, embeddings map them to the catalogue, and the image coordinates are projected into the 3D world.</figcaption>
+      </figure>
+      <figure class="shot narrow">
+        <a href="assets/real-to-sim-scene-graph.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/real-to-sim-scene-graph.png" alt="Scene graph: a mug on a washing machine, scissors on the mug, and a banana next to the mug that inherits the washing machine as its parent." loading="lazy"></a>
+        <figcaption>Scene graph from the report (translated into English), for “a mug on a washing machine, scissors on the mug, and a banana next to the mug”. The banana inherits the mug's parent (dashed red arrow), so it stays on the washing machine.</figcaption>
+      </figure>` },
+      { h: "Further reading on the real-to-sim gap", html: `<ul>
+        <li><a class="ext" href="https://arxiv.org/abs/2009.13303" target="_blank" rel="noopener">Sim-to-Real Transfer in Deep Reinforcement Learning for Robotics: a Survey</a>. Zhao, Peña Queralta and Westerlund, 2020.</li>
+        <li><a class="ext" href="https://arxiv.org/abs/2403.03949" target="_blank" rel="noopener">Reconciling Reality through Simulation: A Real-to-Sim-to-Real Approach for Robust Manipulation</a>. Torne et al., RSS 2024.</li>
+        <li><a class="ext" href="https://arxiv.org/abs/1703.06907" target="_blank" rel="noopener">Domain Randomization for Transferring Deep Neural Networks from Simulation to the Real World</a>. Tobin et al., IROS 2017.</li>
+        <li><a class="ext" href="https://arxiv.org/abs/1611.04201" target="_blank" rel="noopener">CAD2RL: Real Single-Image Flight without a Single Real Image</a>. Sadeghi and Levine, RSS 2017.</li>
+        <li><a class="ext" href="https://arxiv.org/abs/2311.01455" target="_blank" rel="noopener">RoboGen: Towards Unleashing Infinite Data for Automated Robot Learning via Generative Simulation</a>. Wang et al., 2023.</li>
+        <li><a class="ext" href="https://arxiv.org/abs/2312.09067" target="_blank" rel="noopener">Holodeck: Language Guided Generation of 3D Embodied AI Environments</a>. Yang et al., CVPR 2024.</li>
+      </ul>` }
+    ],
+    links: [
+      { label: "Code", url: "https://github.com/ananalab/Real-to-Sim" },
+      { label: "Report (PDF, French)", url: "assets/real-to-sim-report.pdf" }
+    ]
+  },
+  {
+    id: "qd-damage",
+    title: "Damage recovery for a four-legged robot",
+    year: "2026",
+    context: "Independent project",
+    status: "done",
+    blurb: "A simulated quadruped loses the use of a leg. Using a repertoire of gaits learned in advance, it finds a new way to walk in a handful of trials, where re-training with reinforcement learning needs hundreds of episodes. This behavior mimics that of injured animals and was first introduced by Cully et al. (Nature 2015) as Intelligent Trial & Error.",
+    art: "duo",
+    media: { type: "video", src: "assets/qd-damage/after-ite.mp4", poster: "assets/qd-damage/after-ite.jpg" },
+    hero: {
+      html: `<div class="vids">
+        <figure class="vid"><video src="assets/qd-damage/intact.mp4" poster="assets/qd-damage/intact.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Intact robot walking"></video><figcaption><b>1 · Intact</b><span>30.5 m in 12.5 s</span></figcaption></figure>
+        <figure class="vid"><video src="assets/qd-damage/damaged.mp4" poster="assets/qd-damage/damaged.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Robot with its front-right leg paralysed, using the same gait"></video><figcaption><b>2 · Front-right leg paralysed, same gait</b><span>3.0 m</span></figcaption></figure>
+        <figure class="vid"><video src="assets/qd-damage/after-ite.mp4" poster="assets/qd-damage/after-ite.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Damaged robot using the gait found by Intelligent Trial and Error"></video><figcaption><b>3 · After 6 trials of ITE</b><span>10.4 m</span></figcaption></figure>
+      </div>`,
+      caption: "The best gait of a DCRL-ME repertoire on the Brax Ant, followed by the camera. Paralysing the front-right leg leaves the robot almost on the spot, however after 6 trials, Intelligent Trial & Error picks another gait from the repertoire that walks three times further. Each clip is the median of 8 episodes."
+    },
+    tags: ["Quality-Diversity", "Reinforcement learning", "Robot adaptation", "Bayesian optimisation"],
+    tools: ["Python", "JAX", "QDax", "Brax", "TD3"],
+    keywords: ["Quality-Diversity", "Damage recovery", "Intelligent Trial and Error", "MAP-Elites", "DCRL-ME", "TD3", "Gaussian processes", "Bayesian optimisation", "Legged locomotion", "PGA-ME", "Brax"],
+    facts: [
+      ["Robot", "Ant (four legs, eight motors), simulated in Brax"],
+      ["Scale", "9 repertoires, 12 damages, 4.6 million episodes to build the repertoires"],
+      ["Format", "Solo project"]
+    ],
+    sections: [
+      { h: "Question", html: `<p>A legged robot that loses the use of a leg should find a new way to walk with as few physical trials as possible, since each trial on real hardware costs time and wear. Intelligent Trial & Error (Cully et al., <i>Nature</i> 2015) does it by searching a repertoire of diverse gaits learned beforehand in simulation.</p>
+        <p>Recent Quality-Diversity algorithms build such repertoires with the help of reinforcement-learning critics and reach much faster gaits. Do they keep the diversity that makes a repertoire useful after damage, and how does adapting from a repertoire compare with simply re-training with RL?</p>` },
+      { h: "Approach", html: `<ul>
+        <li><strong>Repertoires.</strong> Three algorithms at equal budget: MAP-Elites (evolution only), and PGA-ME and DCRL-ME, where a TD3 critic improves the gaits. Each repertoire holds up to 1,024 gaits, sorted by how often each foot touches the ground; 3 seeds per algorithm, about 512,000 episodes per run.</li>
+        <li><strong>Damages.</strong> 12 scenarios: each leg paralysed or weakened, two legs paralysed, or a single ankle paralysed.</li>
+        <li><strong>Adaptation.</strong> ITE models how the damage changes each gait's performance with a Gaussian process, tries the most promising gait, and updates its predictions for similar gaits after every trial. It is compared with three baselines (replaying the best intact gait, trying gaits by decreasing intact performance, trying them at random) with RL re-training (TD3) on the damaged robot, and with a TD3 policy trained in simulation on random damages.</li>
+      </ul>
+      <figure class="shot">
+        <a href="assets/qd-damage/qd-map-before-after.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/qd-damage/qd-map-before-after.png" alt="Two scatter plots of the repertoire, coloured by performance, before and after the damage, with the six gaits tried by ITE numbered on the damaged one." loading="lazy"></a>
+        <figcaption>The DCRL-ME repertoire, one point per gait, placed by how long the front and hind feet stay on the ground. Most gaits lose a lot once the front-right leg is paralysed. ITE tried six of them (orange) and stopped on the sixth, which keeps the paralysed leg off the ground.</figcaption>
+      </figure>` },
+      { h: "Results", html: `<div class="figs">
+          <div class="fig"><b>5 trials</b><span>median for ITE to settle on a gait, against a median of 400 to 450 episodes for the best TD3 re-training</span></div>
+          <div class="fig"><b>33%</b><span>of the best intact gait's progress recovered by ITE, against 18% without adaptation</span></div>
+          <div class="fig"><b>5 to 13×</b><span>better gaits after damage with repertoires built using RL than with MAP-Elites alone</span></div>
+        </div>
+        <ul>
+          <li><strong>RL-built repertoires are not more fragile.</strong> The share of intact progress still reachable after damage does not differ significantly between algorithms (Mann-Whitney, p > 0.4), while PGA-ME and DCRL-ME keep much faster gaits.</li>
+          <li><strong>ITE works, but a good prior does most of it.</strong> Simply trying the gaits by decreasing intact performance does almost as well (27% after 3 trials, against 28% for ITE). ITE only helps clearly on DCRL-ME repertoires, and a second descriptor based on joint usage, which models the damage three times better, does not change this.</li>
+          <li><strong>RL re-training is far more expensive.</strong> Within 2,000 episodes, TD3 matches the gait found by ITE in 3 of 8 runs from scratch and in 2 of 8 by plain fine-tuning, which collapses because its critic is untrained. With a critic warm-up or a critic pre-trained on the intact robot, it succeeds in all 8 runs, but still needs a median of 400 to 450 episodes.</li>
+          <li><strong>A damage-robust policy is a serious competitor.</strong> A TD3 policy trained in simulation on random damages matches ITE on the best repertoires without any trial, as long as the damage belongs to its training distribution. It fails when two legs are paralysed.</li>
+        </ul>
+        <figure class="shot">
+          <a href="assets/qd-damage/qd-trials.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/qd-damage/qd-trials.png" alt="Recovered performance against the number of episodes on the damaged robot, log scale: ITE and top-k reach about 33% within 20 trials, while RL starts far below zero and only climbs back to standing-still level after about a thousand episodes." loading="lazy"></a>
+          <figcaption>Recovered performance against episodes on the damaged robot (log scale), median over all repertoires and damages. Repertoire-based methods are done within 20 trials; plain TD3 re-training starts far below a robot standing still and needs about a thousand episodes just to get back to zero.</figcaption>
+        </figure>
+        <figure class="shot">
+          <a href="assets/qd-damage/qd-repertoires.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/qd-damage/qd-repertoires.png" alt="Three learning curves over 512,000 episodes: DCRL-ME reaches the highest QD-score and coverage, PGA-ME the fastest gait, MAP-Elites stays lowest on all three." loading="lazy"></a>
+          <figcaption>Building the repertoires on the intact robot (median and interquartile range over 3 seeds). DCRL-ME covers the most behaviours (83.8% of cells), PGA-ME finds the fastest gaits.</figcaption>
+        </figure>` },
+      { h: "Explore the simulation in 3D", html: `<p>The three episodes from the videos above, replayed in the Brax viewer. Drag to turn the camera, scroll to zoom.</p>
+        <div class="sim-view"><iframe src="assets/qd-damage/3d/index.html" title="Interactive 3D replay of the three episodes" loading="lazy"></iframe></div>` },
+      { h: "What is new", html: `<p>Chalumeau et al. (ICLR 2023) already damaged the Ant's legs, but picked each skill with an oracle that evaluates every one of them. This project counts the real number of trials with ITE, adds DCRL-ME, and compares against RL re-training at the same scale of episodes and against a damage-robust policy.</p>` },
+      { h: "My contribution", html: `<p>Solo project, from the question to the report. I wrote the damage models and checked the mapping between actions and legs, set up the three algorithms with a shared configuration so they differ only by their emitter, implemented ITE and the baselines, fitted the Gaussian process on separate development repertoires, ran the full campaign with exact checkpoint resumption, and wrote the analysis, the visualisations and the report. I also prepared an example notebook on ITE for the QDax library.</p>` },
+      { h: "Limits", html: `<p>Simulation only, one robot, damages modelled as weakened motors, one repertoire size and three seeds per algorithm. The robust policy is tested on the family of damages it was trained on, so the case for repertoires and ITE remains the unexpected damage on a real robot, which is the natural next step.</p>` }
+    ],
+    links: [
+      { label: "Code", url: "https://github.com/ananalab/qd-damage-recovery" },
+      { label: "Report (PDF)", url: "assets/qd-damage/report.pdf" }
+    ]
+  },
+  {
+    id: "birdclef",
+    title: "Species sound classification with classical ML",
+    year: "2026",
+    context: "Master's project · Sorbonne University",
+    status: "done",
+    blurb: "Multi-label recognition of Pantanal wildlife sounds for the BirdCLEF+ 2026 Kaggle competition: hand-crafted acoustic features against frozen pre-trained embeddings, and how much field noise degrades both.",
+    art: "world",
+    media: { src: "assets/birdclef-map-thumb.jpg", alt: "World map of the 35,549 focal training recordings, coloured by taxonomic class, with the Pantanal box." },
+    hero: {
+      html: `<div class="map-view"><iframe src="assets/birdclef-map/index.html" title="Interactive world map of the focal training recordings, coloured by taxonomic class" loading="lazy"></iframe></div>`,
+      caption: "Where the 35,549 focal training recordings were made, coloured by taxonomic class. Zoom in to explore them, and hover or tap a point to see the species. Most were recorded far from the Pantanal (orange box), where the model is actually used: only 2.4% fall inside it."
+    },
+    tags: ["Bioacoustics", "Domain shift", "Multi-label classification", "Tabular ML"],
+    tools: ["Python", "librosa", "LightGBM", "XGBoost", "scikit-learn", "Optuna", "Perch embeddings"],
+    keywords: ["Bioacoustics", "Multi-label classification", "Domain shift", "Acoustic features", "Perch embeddings", "LightGBM", "Pseudo-labeling", "MFCC", "Grouped cross-validation", "Bayesian optimisation", "ROC-AUC"],
+    facts: [
+      ["Task", `<a class="ext" href="https://www.kaggle.com/competitions/birdclef-2026" target="_blank" rel="noopener">BirdCLEF+ 2026</a> Kaggle competition, Pantanal (Brazil)`],
+      ["Data", "35,549 focal recordings (234 species) and 10,658 field soundscapes, 66 of them annotated"],
+      ["Constraint", "No neural network trained"],
+      ["Metric", "Macro ROC-AUC per 5-second window"],
+      ["Period", "May 2026, individual project"]
+    ],
+    sections: [
+      { h: "Goal", html: `<p>Autonomous recorders capture far more sound than experts can listen to, so species have to be identified automatically. The task, set by the BirdCLEF+ 2026 Kaggle competition, is to predict for every 5-second window which of 234 species are present. Several species usually overlap, so the problem is multi-label. The rule of the project: no neural network may be trained, only classical tabular models.</p>` },
+      { h: "Two tracks", html: `<ul>
+        <li><strong>Strict track.</strong> 969 hand-crafted acoustic features per window (temporal, spectral, MFCCs and their derivatives, mel statistics, bioacoustic indices, pitch) feed a LightGBM, with one binary classifier per species.</li>
+        <li><strong>Hybrid track.</strong> Embeddings from Perch, a bioacoustic model pre-trained by Google and kept frozen, feed an L2-regularised logistic regression.</li>
+      </ul>
+      <figure class="shot">
+        <a href="assets/birdclef-signatures.jpg" target="_blank" rel="noopener" title="Open full size"><img src="assets/birdclef-signatures.jpg" alt="Five mel-spectrograms, one per taxonomic class: bird calls as stacked harmonics, a toad as a broad low band, a cicada as a narrow continuous band, a dog as short broadband bursts, and a caiman as repeated low sweeps." loading="lazy"></a>
+        <figcaption>One recording per taxonomic class (mel-spectrograms from the report, relabelled in English). Each class leaves a very different trace, which is why the hand-crafted features combine six families of descriptors rather than a single one.</figcaption>
+      </figure>` },
+      { h: "Data analysis", html: `<p>The data analysis came first, and each finding led to a design decision:</p>
+        <ul>
+        <li>Loudness varies by a factor of up to 55,000 between files, so every recording is normalised before feature extraction.</li>
+        <li>28 species, almost all insects, have no clean focal recording and cannot be learned by the strict track, which is therefore trained on the 206 learnable species.</li>
+        <li>Recordings are concentrated by author and mostly made far from the Pantanal (map above), which calls for validation grouped by recording.</li>
+        <li>Focal recordings and field soundscapes differ significantly on every low-level descriptor tested (Mann–Whitney, p &lt; 0.001), so a held-out set of annotated soundscapes serves as the final judge.</li>
+      </ul>
+      <figure class="shot">
+        <a href="assets/birdclef-domain-gap.jpg" target="_blank" rel="noopener" title="Open full size"><img src="assets/birdclef-domain-gap.jpg" alt="Four mel-spectrograms of 5-second windows: two clean focal recordings with a single call on a dark background, and two field soundscapes where several species and background noise fill the whole spectrum." loading="lazy"></a>
+        <figcaption>Five-second windows, from the report (relabelled in English). Focal recordings put one species in the foreground on a quiet background, while field soundscapes mix several species and ambient noise over the whole spectrum. Models learn from the former and must work on the latter.</figcaption>
+      </figure>` },
+      { h: "Method", html: `<ul>
+        <li>Five classifiers compared on a ten-species subset, then LightGBM tuned by Bayesian optimisation (50 trials).</li>
+        <li>Five-fold cross-validation grouped by recording and stratified by species, which avoids a leak worth about 0.04 of score.</li>
+        <li>A held-out set of annotated field soundscapes, never seen during training, as the final evaluation.</li>
+        <li>Two attempts to close the gap with the field: pseudo-labeling the unannotated soundscapes, and mixing ambient noise into the training windows.</li>
+      </ul>` },
+      { h: "Results", html: `<div class="figs">
+          <div class="fig"><b>0.95 → 0.75</b><span>Perch embeddings, from cross-validation on clean recordings to the field held-out set</span></div>
+          <div class="fig"><b>0.84 → 0.61</b><span>strict hand-crafted track, over the same two evaluations</span></div>
+          <div class="fig"><b>0.58 → 0.70</b><span>strict track on the best-measured species, after pseudo-labeling the unannotated soundscapes</span></div>
+        </div>
+        <p>Cross-validation on clean recordings substantially overestimates real performance, and this domain gap is the main finding of the project. Pseudo-labeling helped the weaker track and slightly hurt the stronger one, while mixing ambient noise into the training windows barely helped the hand-crafted track and hurt Perch.</p>
+        <figure class="shot">
+          <a href="assets/birdclef-results.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/birdclef-results.png" alt="Dot plot of macro ROC-AUC: the hand-crafted track drops from 0.84 in cross-validation to 0.61 on field soundscapes, 0.66 after pseudo-labeling; the Perch track drops from 0.95 to 0.75, 0.71 after pseudo-labeling." loading="lazy"></a>
+          <figcaption>Both tracks drop sharply from cross-validation on focal recordings to the held-out field soundscapes. Pseudo-labeling recovers part of the loss for the hand-crafted track and costs a little for Perch (all 47 evaluable species).</figcaption>
+        </figure>
+        <p>Perch wins on 36 of the 47 species that can be evaluated, but hand-crafted features beat it on 10 species, both birds and frogs, sometimes by a wide margin: on the Lesser Tree Frog, Perch, trained mostly on birds, falls to 0.04. This suggests a hybrid system that picks the track per species.</p>
+        <figure class="shot medium">
+          <a href="assets/birdclef-per-species.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/birdclef-per-species.png" alt="Scatter plot of held-out ROC-AUC per species, hand-crafted features against Perch, coloured by taxonomic class, with most points above the diagonal." loading="lazy"></a>
+          <figcaption>Held-out ROC-AUC per species, coloured by class. Above the diagonal Perch does better, below it the hand-crafted features win. No insect has enough annotated field windows to be evaluated.</figcaption>
+        </figure>` },
+      { h: "My contribution", html: `<p>Individual project, from the data analysis to the final report. I designed the feature set and the validation protocol, tuned LightGBM by Bayesian search, and ran the pseudo-labeling, noise-augmentation and per-species error analyses.</p>` }
+    ],
+    links: [
+      { label: "Code", url: "https://github.com/ananalab/birdclef-2026" },
+      { label: "Kaggle", url: "https://www.kaggle.com/competitions/birdclef-2026" },
+      { label: "Report (PDF, French)", url: "assets/birdclef-report.pdf" }
+    ]
+  },
+  {
+    id: "icu-risk",
+    title: "Interpretable severity formulas for ventilated ICU patients",
+    year: "2026",
+    context: "Research internship · IRIT, Toulouse",
+    status: "done",
+    blurb: "Symbolic regression by genetic programming to model, as explicit and clinically interpretable expressions, the severity assessment of respiratory disorders in mechanically ventilated patients.",
+    art: "graph",
+    media: { caption: "Methods, results, report and code are currently confidential, pending publication in a medical journal." },
+    tags: ["Genetic programming", "Symbolic regression", "Interpretable ML", "Healthcare"],
+    tools: ["Python", "scikit-learn", "PySR", "gplearn", "hal-cgp", "SHAP", "Gemini"],
+    keywords: ["Genetic programming", "Symbolic regression", "Interpretable machine learning", "Cartesian genetic programming", "Mechanical ventilation", "Intensive care", "Small-data learning"],
+    facts: [
+      ["Lab", `REVA team, <a class="ext" href="https://www.irit.fr/" target="_blank" rel="noopener">Institut de Recherche en Informatique de Toulouse</a>, Université Toulouse Capitole`],
+      ["Clinical partner", "Intensive care unit, CHU de Toulouse"],
+      ["Supervision", "Dr. Giorgia Nadizar, postdoctoral researcher, IRIT<br>Prof. Sylvain Cussat-Blanc, IRIT<br>Prof. Dennis Wilson, ISAE-Supaero<br>Dr. Michael Poette, ICU, CHU de Toulouse"],
+      ["Period", "Jun – Aug 2026 (M1 internship)"],
+      ["Data", "Mechanically ventilated ICU patients, with severity scores annotated by clinicians"]
+    ],
+    sections: [
+      { h: "Context and objectives", html: `<p>Assessing the severity of a mechanically ventilated patient requires the joint interpretation of many physiological parameters. This expertise is largely implicit, which makes it difficult to formalise, to teach and to audit. Machine-learning models can reproduce such judgements, but their opacity limits their clinical adoption, and post-hoc explanation methods do not describe how the variables are actually combined.</p>
+        <p>This work investigates whether explicit mathematical expressions obtained by genetic programming can reach the predictive performance of black-box models, how many annotated patients they require, and what they reveal about the underlying clinical reasoning.</p>` },
+      { h: "Contributions", html: `<ul>
+        <li>Design of an evaluation protocol free of information leakage, adapted to a small clinical cohort and to a target defined by noisy expert judgement.</li>
+        <li>Benchmark of standard machine-learning models to establish a black-box reference.</li>
+        <li>Implementation of a Cartesian genetic programming engine from scratch, compared with established symbolic-regression libraries.</li>
+        <li>Quantitative assessment of formula interpretability and analysis of the trade-off between interpretability and predictive accuracy.</li>
+        <li>Use of the resulting expressions to analyse clinical reasoning, including the comparison of clinicians with different levels of experience.</li>
+        <li>Exploratory study of large language models as assistants to symbolic regression, each evaluated against a control condition.</li>
+      </ul>` },
+      { h: "Confidentiality", html: `<p>The detailed methods and results, as well as the report and source code, are currently confidential, as this work is being prepared for submission to a medical journal.</p>` }
+    ],
+    links: []
+  },
+  {
+    id: "sign-recognition",
+    title: "Real-time sign recognition with a CNN, from ASL to French Belgian Sign Language",
+    year: "2026",
+    context: "Independent project",
+    status: "done",
+    blurb: "Recognition of isolated signs from a webcam, in real time and entirely in the browser, from body, hand and lip landmarks. Evaluation on signers never seen during training, and study of transfer from American Sign Language (ASL) to French Belgian Sign Language (LSFB).",
+    art: "hand",
+    media: { clips: ["clown", "hello", "thankyou", "aussi"].map(c => ({ src: `assets/sign-recognition/${c}.mp4`, poster: `assets/sign-recognition/${c}.jpg` })) },
+    hero: {
+      html: `<div class="vids four">
+        <figure class="vid"><video src="assets/sign-recognition/clown.mp4" poster="assets/sign-recognition/clown.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign clown"></video><figcaption><b>ASL · clown</b><span>99% recognised</span></figcaption></figure>
+        <figure class="vid"><video src="assets/sign-recognition/hello.mp4" poster="assets/sign-recognition/hello.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign hello"></video><figcaption><b>ASL · hello</b><span>56% recognised</span></figcaption></figure>
+        <figure class="vid"><video src="assets/sign-recognition/thankyou.mp4" poster="assets/sign-recognition/thankyou.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign thank you"></video><figcaption><b>ASL · thank you</b><span>56% recognised</span></figcaption></figure>
+        <figure class="vid"><video src="assets/sign-recognition/aussi.mp4" poster="assets/sign-recognition/aussi.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the LSFB sign AUSSI"></video><figcaption><b>LSFB · AUSSI (also)</b><span>90% recognised</span></figcaption></figure>
+      </div>`,
+      caption: "What the model sees: hands, upper body and lips extracted by MediaPipe Holistic. Below each sign, the share of its test clips recognised for signers never seen during training."
+    },
+    tags: ["Computer vision", "Sequence models", "Transfer learning", "Web deployment"],
+    tools: ["Python", "PyTorch", "MediaPipe Holistic", "ONNX", "ONNX Runtime Web", "JavaScript", "Kaggle GPUs", "pytest"],
+    keywords: ["Isolated sign recognition", "Transfer learning", "Signer-independent evaluation", "Pose landmarks", "Conv-Transformer", "MediaPipe Holistic", "Bidirectional GRU", "ONNX Runtime Web", "Data augmentation"],
+    facts: [
+      ["Task", "Isolated sign recognition, closed vocabulary"],
+      ["Input", "MediaPipe Holistic landmarks: 89 points per frame (hands, upper body, lips)"],
+      ["Model", "Convolutional neural network with self-attention (Conv-Transformer, 2.2 M parameters), compared with a bidirectional GRU"],
+      ["Data", "Google ISLR: 250 ASL signs, 94,477 clips, 21 signers<br>LSFB-ISOL: 100 LSFB signs, 55,286 clips, 99 signers"],
+      ["Evaluation", "Signer-independent: 4 ASL and 40 LSFB test signers, three seeds per model"]
+    ],
+    sections: [
+      { h: "Context and objectives", html: `<p>This project addresses <em>isolated</em> sign recognition: identifying a single sign from a closed vocabulary. It is not translation, which would require the grammar, use of space and facial expressions of the language. Models work on landmarks rather than pixels, which keeps them small, fast on CPU and independent of background, and avoids transmitting any video.</p>
+        <p>Three questions guide the study: what accuracy can be expected on people never seen during training, whether a model pre-trained on ASL helps on LSFB, a language with far less labelled data (and distinct from French Sign Language, LSF), and whether recognition can run in real time in a browser without GPU.</p>` },
+      { h: "Method", html: `<ul>
+        <li><strong>Preprocessing.</strong> Landmarks mirrored to a canonical dominant hand, normalised in the body frame and resampled to 64 frames. A single unit-tested function is shared by training and by its JavaScript port in the browser.</li>
+        <li><strong>Training.</strong> Both networks and a statistical baseline trained with three seeds each on Kaggle GPUs, with time-warping and spatial augmentations.</li>
+        <li><strong>Protocol.</strong> Signer-independent splits frozen before any experiment; test sets used once, for the final models.</li>
+      </ul>` },
+      { h: "Key results", html: `<div class="figs">
+          <div class="fig"><b>64.8%</b><span>top-1 on 250 ASL signs and 4 unseen signers (chance: 0.4%, statistical baseline: 42.1%)</span></div>
+          <div class="fig"><b>68.3%</b><span>top-1 on 100 LSFB signs and 40 unseen signers (statistical baseline: 49.0%)</span></div>
+          <div class="fig"><b>+16.9 pts</b><span>overestimation when the same signers appear in training and test (random split)</span></div>
+          <div class="fig"><b>16 ms</b><span>per sign in the browser on one CPU thread, with the same predictions as PyTorch on 40 of 40 clips</span></div>
+        </div>
+        <figure class="shot wide">
+          <a href="assets/sign-recognition/signers_missing.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/signers_missing.png" alt="Two panels: ASL test accuracy per unseen signer, between about 61% and 70%, and accuracy against the share of frames without a detected hand, falling from about 76% to 52% beyond half of the frames." loading="lazy"></a>
+          <figcaption>Accuracy varies from one unseen signer to another (a), and depends above all on whether MediaPipe finds the hands (b): 76% when they are missing in at most 10% of the frames, 52% beyond half, a case that concerns 30% of the ASL test clips.</figcaption>
+        </figure>` },
+      { h: "Which signs are recognised best, and why", html: `<div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>ASL sign</th><th class="num">Recognised</th><th>Most frequent confusion</th></tr></thead>
+          <tbody>
+            <tr class="grp"><td colspan="3">Best-recognised signs</td></tr>
+            <tr><td>clown</td><td class="num">99%</td><td>none above 2%</td></tr>
+            <tr><td>flower</td><td class="num">97%</td><td>none above 2%</td></tr>
+            <tr><td>owl</td><td class="num">96%</td><td>none above 2%</td></tr>
+            <tr class="grp"><td colspan="3">Everyday signs</td></tr>
+            <tr><td>please</td><td class="num">90%</td><td><i>mine/my</i> (4%)</td></tr>
+            <tr><td>hello</td><td class="num">56%</td><td><i>pretend</i> (17%), <i>bedroom</i> (9%)</td></tr>
+            <tr><td>thank you</td><td class="num">56%</td><td><i>bad</i> (10%)</td></tr>
+            <tr><td>mom</td><td class="num">52%</td><td><i>farm</i> (14%)</td></tr>
+          </tbody>
+          <caption>Share of each sign's test clips recognised by the Conv-Transformer (mean over three seeds). Median over the 250 signs: 67%.</caption>
+        </table></div>
+        <p>All signs have a similar number of training clips, so what matters is how distinct a sign is from the others, not how common it is.</p>
+        <ul>
+          <li><strong>The best signs are produced on the face.</strong> <i>Clown</i>, <i>flower</i> and <i>owl</i> are articulated at the nose or the eyes, each with a handshape that no other sign uses there.</li>
+          <li><strong>Basic signs have close neighbours.</strong> <i>Hello</i>, <i>thank you</i> and <i>mom</i> use the most common handshapes (flat or spread hand) at the forehead or chin, where many signs are made. <i>Thank you</i> and <i>bad</i> differ mainly in the final palm orientation, poorly captured in 2D; <i>mom</i> and <i>farm</i> differ only by a tap versus a sweep across the chin. Everyday signs with a distinctive movement, such as <i>please</i>, remain easy.</li>
+        </ul>` },
+      { h: "No transfer from ASL to LSFB", html: `<p>Contrary to the initial hypothesis, initialising the LSFB model from ASL never helps, from 5 examples per sign to the full corpus (left), and with all the data it is even slightly but significantly harmful (66.2% against 68.3% from scratch, on 40 unseen signers). A likely explanation is that the corpora differ in more than the language: isolated signs filmed on a smartphone for ASL, where the hands often leave the frame (right), against signs cut from studio conversations, twice as short, for LSFB.</p>
+        <div class="shots2">
+        <figure class="shot">
+          <a href="assets/sign-recognition/transfer_curve.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/transfer_curve.png" alt="Line chart of LSFB validation accuracy against training examples per sign, from 5 to all: the from-scratch and ASL-pretrained curves overlap up to 25 examples, then from-scratch stays slightly above." loading="lazy"></a>
+          <figcaption>LSFB validation accuracy against training examples per sign (mean ± s.d. over three seeds).</figcaption>
+        </figure>
+        <figure class="shot">
+          <a href="assets/sign-recognition/missing_parts.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/missing_parts.png" alt="Bar chart of frames with a body part missing: in ASL, left hand 72%, right hand 62%, both hands 34%; in LSFB, 10%, 8% and 2%; upper body and lips almost never missing." loading="lazy"></a>
+          <figcaption>Share of frames in which MediaPipe misses each body part: no hand at all in 34% of ASL frames, against 2% for LSFB.</figcaption>
+        </figure>
+        </div>` },
+      { h: "What matters, and pitfalls uncovered", html: `<figure class="shot medium">
+          <a href="assets/sign-recognition/ablations.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/ablations.png" alt="Horizontal bar chart of the change in ASL validation accuracy for each ablation: removing the canonical dominant hand costs 3.8 points, velocities 1.7, augmentation 1.3, while removing lips or zero-padding instead of resampling slightly helps." loading="lazy"></a>
+          <figcaption>One-factor ablations on ASL (change in validation accuracy, in points). Mirroring every clip to a canonical dominant hand matters most; lips, depth and longer sequences do not help. †: run ended early, effect possibly overestimated.</figcaption>
+        </figure>
+        <figure class="shot wide">
+          <a href="assets/sign-recognition/normalisation.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/normalisation.png" alt="Three scatter plots of ASL and LSFB landmarks: in image coordinates, in the body frame without aspect correction where the LSFB nose lies far above the ASL one, and after correction where both align." loading="lazy"></a>
+          <figcaption>Anamorphic LSFB videos: in the body frame, the LSFB nose lies far above the ASL one (b) until the aspect ratio is corrected (c).</figcaption>
+        </figure>
+        <ul>
+        <li><strong>Quantisation.</strong> Naive INT8 quantisation halves accuracy (68% to 34%) because of rare feature outliers, and even once fixed, the model is slower on CPU; the demo ships FP32.</li>
+        <li><strong>Early stopping.</strong> Stopping on a plateau made one ablation look five times more harmful than it is.</li>
+      </ul>` },
+      { h: "Interactive demo", html: `<figure class="shot wide">
+          <a href="assets/sign-recognition/demo/index.html" target="_blank" rel="noopener" title="Open the demo"><img src="assets/sign-recognition/demo.png" alt="Demo interface: on the left, the replayed skeleton of an LSFB clip; on the right, the prediction EQUIPE at 84%, the top-5 signs, signs to try and the vocabulary." loading="lazy"></a>
+          <figcaption>Signs are segmented automatically from the webcam and classified locally; LSFB test clips can also be replayed without a camera. Click the image to open the demo.</figcaption>
+        </figure>` },
+      { h: "Limitations", html: `<ul>
+        <li>Few signers (21 for ASL): accuracy on a new user can be well below the average.</li>
+        <li>Only the lips are used from the face, whereas eyebrows, gaze and head movements carry part of the grammar.</li>
+        <li>Not evaluated with Deaf signers; such technologies should be built with and for Deaf communities.</li>
+      </ul>` }
+    ],
+    links: [
+      { label: "Live demo", url: "assets/sign-recognition/demo/index.html" },
+      { label: "Paper (PDF)", url: "assets/sign-recognition/paper.pdf" },
+      { label: "Code", url: "https://github.com/ananalab/Real-time-sign-recognition-with-a-Conv-Transformer-on-MediaPipe-landmarks" }
+    ]
+  },
+  {
+    id: "llm-reward",
+    title: "Can an LLM write a robot's reward?",
+    year: "2026",
+    context: "Independent project",
+    status: "ongoing",
+    blurb: "A language model writes the reward functions used to train a simulated robot with reinforcement learning, and improves them from feedback. Does seeing images of the robot help it correct its mistakes?",
+    art: "loop",
+    media: { caption: "Schematic illustration of the concept. The project is in progress." },
+    tags: ["LLMs", "Reinforcement learning", "Reward design"],
+    tools: ["Python", "JAX", "MuJoCo Playground", "Brax PPO", "LLM APIs"],
+    keywords: ["Reward design", "Reward hacking", "LLM", "Eureka", "PPO", "Visual feedback", "MuJoCo Playground"],
+    facts: [
+      ["Status", "In progress"],
+      ["Format", "Solo project"],
+      ["Setting", "Simulated locomotion tasks (MuJoCo Playground)"]
+    ],
+    sections: [
+      { h: "Concept", html: `<p>In reinforcement learning, a robot learns from a reward function that scores its behaviour. Writing this function by hand is difficult: a poorly specified reward is often exploited by the robot in unintended ways, a phenomenon known as <em>reward hacking</em>.</p>
+        <p>Following Eureka (Ma et al., 2023), a language model writes the reward, a policy is trained with it, and the model revises the reward from the outcome. The project tests whether giving the model images of the robot's behaviour, in addition to training statistics, helps it detect and correct such failures.</p>` },
+      { h: "Status", html: `<p>In progress.</p>` }
+    ],
+    links: [
+      { label: "Code", url: "https://github.com/ananalab/llm-reward-lab" }
+    ]
+  },
+  {
+    id: "vla-robustness",
+    title: "Stress-testing a vision-language-action model",
+    year: "2026",
+    context: "Independent project",
+    status: "ongoing",
+    blurb: "A robot model that turns a camera image and an instruction into arm motions: how does it fail when conditions drift from its training data, and can a small correction learned by reinforcement learning compensate?",
+    art: "dose",
+    media: { caption: "Schematic illustration of the concept. The project is in progress." },
+    tags: ["VLA", "Robustness", "Residual RL"],
+    tools: ["Python", "PyTorch", "LeRobot", "LIBERO", "MuJoCo"],
+    keywords: ["Vision-language-action models", "SmolVLA", "Distribution shift", "Robustness evaluation", "Residual reinforcement learning", "LIBERO"],
+    facts: [
+      ["Status", "In progress"],
+      ["Model", "SmolVLA (450M parameters)"],
+      ["Benchmark", "LIBERO, simulated Franka arm"],
+      ["Format", "Solo project"]
+    ],
+    sections: [
+      { h: "Concept", html: `<p>Vision-language-action (VLA) models receive a camera image and a natural-language instruction, such as “put the bowl on the plate”, and directly output the motions of a robot arm. Their behaviour outside the conditions seen during training remains poorly understood.</p>
+        <p>The project studies a small open model, SmolVLA, in simulation: it checks whether the model actually follows the instruction, measures how its success rate degrades as perturbations such as a camera shift or a lighting change increase, and tests whether a small residual policy trained by reinforcement learning can repair one of these weaknesses without retraining the model.</p>` },
+      { h: "Status", html: `<p>In progress.</p>` }
+    ],
+    links: [
+      { label: "Code", url: "https://github.com/ananalab/vla-stress-test" }
+    ]
+  },
+  {
+    id: "ai-learning",
+    title: "Measuring AI assistance in children's learning",
+    year: "2026–27",
+    context: "Master's team project · Sorbonne University",
+    status: "ongoing",
+    blurb: "How much does an AI assistant really change what children achieve on a learning task? A controlled study that compares children working with and without the assistant.",
+    art: "seyes",
+    media: { caption: "Schematic illustration of the concept. The project is in progress." },
+    tags: ["Human-AI interaction", "Education", "Evaluation"],
+    tools: ["Python"],
+    keywords: ["Human-AI interaction", "Education", "Controlled study", "Learning assessment"],
+    facts: [
+      ["Status", "In progress"],
+      ["Duration", "6 months"],
+      ["Format", "Team project"]
+    ],
+    sections: [
+      { h: "Concept", html: `<p>AI assistants are increasingly used by children for schoolwork, yet their actual contribution is rarely measured. Better answers obtained with an assistant do not necessarily mean that the child has learned more.</p>
+        <p>The project designs a controlled protocol in which children solve learning tasks with and without an AI assistant, in order to separate the help provided during the task from what the child retains once the assistant is removed.</p>` },
+      { h: "Status", html: `<p>In progress. The protocol and the prototype are under development.</p>` }
+    ],
+    links: []
+  }
+];
+
+/* ---------- rendering ---------- */
+const $ = s => document.querySelector(s);
+const displayName = () => PROFILE.name;
+
+function linkBtn(l, primary) {
+  const external = /^https?:/.test(l.url) || /\.(pdf|html)$/i.test(l.url);
+  return `<a class="btn${primary ? " primary" : ""}" href="${l.url}"${external ? ` target="_blank" rel="noopener"` : ""}>${l.label}</a>`;
+}
+
+function thumbHTML(p) {
+  if (p.media && p.media.clips) {
+    return `<div class="clips">${p.media.clips.map(c => `<video src="${c.src}" poster="${c.poster}" muted loop playsinline autoplay preload="metadata" aria-hidden="true"></video>`).join("")}</div>`;
+  }
+  if (p.media && p.media.src) {
+    return p.media.type === "video"
+      ? `<video src="${p.media.src}"${p.media.poster ? ` poster="${p.media.poster}"` : ""} muted loop playsinline autoplay preload="metadata" aria-hidden="true"></video>`
+      : `<img src="${p.media.src}" alt="${p.media.alt || ""}" loading="lazy">`;
+  }
+  return `<canvas data-art="${p.art}" aria-hidden="true"></canvas>`;
+}
+
+/* Lab names that become links on project pages (not on cards, which are links already) */
+const ORG_LINKS = { ISIR: "https://www.isir.upmc.fr/", IRIT: "https://www.irit.fr/", "ISAE-Supaero": "https://www.isae-supaero.fr/" };
+const linkOrgs = s => s.replace(/\b(ISIR|IRIT|ISAE-Supaero)\b(?![^<]*<\/a>)/g, m => `<a class="ext" href="${ORG_LINKS[m]}" target="_blank" rel="noopener">${m}</a>`);
+
+function metaHTML(p, linked) {
+  const pill = { ongoing: "In progress", planned: "Planned" }[p.status];
+  return `<p class="meta">${pill ? `<span class="pill">${pill}</span>` : ""}<span>${p.year}</span><span aria-hidden="true">·</span><span>${linked ? linkOrgs(p.context) : p.context}</span></p>`;
+}
+
+function renderHome() {
+  const P = PROFILE;
+  const name = P.name;
+  $("#intro").innerHTML = `
+    <div class="intro-main">
+    <p class="avail"><span class="dot" aria-hidden="true"></span>${P.available}</p>
+    <div class="id">
+      <div class="photo"><img src="${P.photo}" alt="Portrait of ${displayName()}"></div>
+      <div><h1 class="name">${name}</h1><p class="role">${P.role}</p></div>
+    </div>
+    <p class="bio">${P.bio}</p>
+    <p class="interests"><b>Interests</b>${P.interests.map(i => `<span>${i}</span>`).join("")}</p>
+    <nav class="links" aria-label="Links">${P.links.map(l => linkBtn(l, false)).join("")}</nav>
+    </div>
+    <aside class="pubs">
+      <h2>Publications <span>in preparation</span></h2>${P.publications.map(q => `<a class="pub" href="#${q.project}"><span class="pub-title">${q.title}</span><span class="pub-authors">${q.authors.replace("A. Azouaoui", "<b>A. Azouaoui</b>")}</span></a>`).join("")}</aside>`;
+
+  $("#count").textContent = `${PROJECTS.length} project${PROJECTS.length > 1 ? "s" : ""}`;
+  $("#grid").innerHTML = PROJECTS.map(p => `
+    <a class="card${p.featured ? " featured" : ""}" href="#${p.id}">
+      <div class="thumb">${thumbHTML(p)}</div>
+      <div class="card-body">
+        ${metaHTML(p)}
+        <h3>${p.title}</h3>
+        <p class="blurb">${p.blurb}</p>
+        <ul class="tags">${p.tags.map(t => `<li>${t}</li>`).join("")}</ul>
+        <span class="more">Read the project <span aria-hidden="true">→</span></span>
+      </div>
+    </a>`).join("");
+
+  $("#foot").innerHTML = `<span>© 2026 ${displayName()}</span><span>Updated ${P.updated}</span>`;
+}
+
+/* Top of a project page: links (code, report...) with an icon, and article-style keywords */
+const LINK_ICONS = {
+  code: '<path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/>',
+  doc: '<path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4M9 13h6M9 17h6"/>',
+  demo: '<path d="M7 4l13 8-13 8z"/>',
+  ext: '<path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/>'
+};
+const linkIcon = label => {
+  const k = /code/i.test(label) ? "code" : /pdf|report|paper/i.test(label) ? "doc" : /demo/i.test(label) ? "demo" : "ext";
+  return `<svg viewBox="0 0 24 24" aria-hidden="true">${LINK_ICONS[k]}</svg>`;
+};
+
+function glanceHTML(p) {
+  const link = l => `<a href="${l.url}" target="_blank" rel="noopener">${linkIcon(l.label)}${l.label}</a>`;
+  return `<aside class="glance" aria-label="Links and keywords">
+    ${p.links.length ? `<div><h2 class="mini">Links</h2><ul class="g-links">${p.links.map(l => `<li>${link(l)}</li>`).join("")}</ul></div>` : ""}
+    <div><h2 class="mini">Keywords</h2><ul class="tags">${p.keywords.map(k => `<li>${k}</li>`).join("")}</ul></div>
+  </aside>`;
+}
+
+/* Keywords at the top of a project page: pack them into as few rows as possible,
+   then, if the column is still taller than the title block, hide the least relevant ones
+   (the list is ordered by relevance), keeping at least six */
+function fitKeywords() {
+  const ul = document.querySelector("#detail .glance .tags"), title = document.querySelector("#detail .d-title");
+  if (!ul || ul.offsetParent === null) return;
+  const all = ul._all || (ul._all = [...ul.children]);
+  ul.replaceChildren(...all);
+  if (!matchMedia("(min-width:860px)").matches) return;   // stacked layout: keep them all
+  const glance = ul.closest(".glance"), gap = parseFloat(getComputedStyle(ul).columnGap) || 0, W = ul.clientWidth;
+  const width = new Map(all.map(li => [li, li.getBoundingClientRect().width]));
+  const pack = items => {   // first-fit decreasing
+    const rows = [];
+    [...items].sort((a, b) => width.get(b) - width.get(a)).forEach(li => {
+      const w = width.get(li), row = rows.find(r => r.w + gap + w <= W + 0.5);
+      if (row) { row.w += gap + w; row.items.push(li); } else rows.push({ w, items: [li] });
+    });
+    ul.replaceChildren(...rows.flatMap(r => r.items));
+  };
+  let n = all.length;
+  pack(all);
+  while (n > 6 && glance.offsetHeight > title.offsetHeight) pack(all.slice(0, --n));
+}
+
+function renderDetail(p) {
+  const n = PROJECTS.length, i = PROJECTS.indexOf(p);
+  const prev = PROJECTS[(i - 1 + n) % n], next = PROJECTS[(i + 1) % n];
+  $("#detail").innerHTML = `
+    <nav class="d-top" aria-label="Project navigation">
+      <a class="back" href="#projects"><span aria-hidden="true">←</span> All projects</a>
+      ${n > 1 ? `<span class="d-step">
+        <a class="back" href="#${prev.id}"><span aria-hidden="true">←</span> Previous project</a>
+        <a class="back" href="#${next.id}">Next project <span aria-hidden="true">→</span></a>
+      </span>` : ""}
+    </nav>
+    <header class="d-head">
+      <div class="d-title">
+        ${metaHTML(p, true)}
+        <h1 tabindex="-1">${p.title}</h1>
+        <p class="lead">${p.blurb}</p>
+      </div>
+      ${glanceHTML(p)}
+    </header>
+    <figure class="hero">
+      ${p.hero ? p.hero.html : `<div class="thumb">${thumbHTML(p)}</div>`}
+      ${p.hero ? `<figcaption>${p.hero.caption}</figcaption>`
+        : p.media && p.media.caption ? `<figcaption>${p.media.caption}</figcaption>` : ""}
+    </figure>
+    <div class="d-body">
+      <aside class="d-aside">
+        <dl class="facts">${p.facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${linkOrgs(v)}</dd></div>`).join("")}</dl>
+        <div><h2 class="mini">Tools</h2><ul class="tags">${p.tools.map(t => `<li>${t}</li>`).join("")}</ul></div>
+      </aside>
+      <div class="d-main">${p.sections.map(s => `<section><h2>${s.h}</h2>${s.html}</section>`).join("")}</div>
+    </div>
+    ${n > 1 ? `<nav class="pn" aria-label="More projects">
+      <a href="#${prev.id}"><small>← Previous</small><span>${prev.title}</span></a>
+      <a href="#${next.id}"><small>Next →</small><span>${next.title}</span></a>
+    </nav>` : ""}`;
+}
+
+/* ---------- routing: #project-id opens a project, anything else shows home ---------- */
+function route() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  const p = PROJECTS.find(x => x.id === id);
+  const home = $("#home"), detail = $("#detail");
+  if (p) {
+    renderDetail(p);
+    home.hidden = true; detail.hidden = false;
+    document.title = `${p.title} · ${displayName()}`;
+    window.scrollTo(0, 0);
+    detail.querySelector("h1").focus({ preventScroll: true });
+    fitKeywords();
+  } else {
+    home.hidden = false; detail.hidden = true;
+    document.title = `${PROFILE.name} · Research portfolio`;
+    if (id === "projects") requestAnimationFrame(() => $("#projects").scrollIntoView());
+    else window.scrollTo(0, 0);
+  }
+  observeCanvases();
+}
+
+/* ---------- drawn thumbnails, from the theme tokens ---------- */
+function tokens() {
+  const cs = getComputedStyle(document.documentElement);
+  const g = n => cs.getPropertyValue(n).trim();
+  return { surface: g("--surface"), sunk: g("--sunk"), ink: g("--ink"), muted: g("--muted"), line: g("--line"),
+           accent: g("--accent"), accentSoft: g("--accent-soft"), onAccent: g("--on-accent") };
+}
+function poly(ctx, pts, fill, stroke, lw) {
+  ctx.beginPath();
+  pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]));
+  ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 1; ctx.stroke(); }
+}
+function seg(ctx, a, b) { ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
+function rrect(ctx, x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+const MONO = '"IBM Plex Mono", ui-monospace, Menlo, monospace';
+
+/* ICU: an evolved program graph over ventilation variables, in black and white; inactive nodes are dashed */
+function artGraph(ctx, w, h, T) {
+  ctx.fillStyle = T.sunk; ctx.fillRect(0, 0, w, h);
+  const r = Math.max(12, Math.min(20, h * 0.07));
+  const ins = ["PEEP", "FiO2", "SpO2", "RR", "age"];
+  const ix = w * 0.2, top = h * 0.15, bot = h * 0.85;
+  const inPos = ins.map((_, i) => [ix, top + (bot - top) * i / (ins.length - 1)]);
+  const c1 = w * 0.43, c2 = w * 0.64, co = w * 0.85;
+  const N = {
+    a: { x: c1, y: h * 0.26, op: "÷", on: true, src: [2, 1] },
+    b: { x: c1, y: h * 0.52, op: "×", on: false, src: [3, 4] },
+    c: { x: c1, y: h * 0.76, op: "−", on: true, src: [0, 3] },
+    d: { x: c2, y: h * 0.42, op: "<", on: true, src: ["a", "c"] },
+    e: { x: c2, y: h * 0.72, op: "max", on: false, src: ["b", 4] }
+  };
+  const out = { x: co, y: h * 0.42 };
+  const pos = s => typeof s === "number" ? [inPos[s][0] + 6, inPos[s][1]] : [N[s].x, N[s].y];
+  const edge = (p, q, on) => {
+    ctx.beginPath(); ctx.moveTo(p[0], p[1]);
+    const mx = (p[0] + q[0]) / 2;
+    ctx.bezierCurveTo(mx, p[1], mx, q[1], q[0], q[1]);
+    ctx.strokeStyle = on ? T.ink : T.muted; ctx.globalAlpha = on ? 1 : 0.5;
+    ctx.lineWidth = on ? 1.8 : 1.1; ctx.setLineDash(on ? [] : [3, 4]); ctx.stroke();
+    ctx.globalAlpha = 1; ctx.setLineDash([]);
+  };
+  Object.values(N).forEach(n => n.src.forEach(s => edge(pos(s), [n.x, n.y], n.on)));
+  edge([N.d.x, N.d.y], [out.x, out.y], true);
+
+  const fs = Math.round(Math.max(10, Math.min(12.5, h * 0.05)));
+  ctx.font = `500 ${fs}px ${MONO}`; ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  const used = [0, 1, 2, 3];
+  ins.forEach((t, i) => {
+    const u = used.includes(i);
+    ctx.fillStyle = u ? T.ink : T.muted; ctx.fillText(t, ix - 4, inPos[i][1]);
+    ctx.beginPath(); ctx.arc(ix + 6, inPos[i][1], 3, 0, Math.PI * 2);
+    ctx.fillStyle = u ? T.ink : T.line; ctx.fill();
+  });
+  ctx.textAlign = "center";
+  Object.values(N).forEach(n => {
+    ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = T.surface; ctx.fill();
+    ctx.setLineDash(n.on ? [] : [3, 3]);
+    ctx.strokeStyle = n.on ? T.ink : T.muted; ctx.lineWidth = n.on ? 1.8 : 1.1; ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = n.on ? T.ink : T.muted; ctx.fillText(n.op, n.x, n.y + 0.5);
+  });
+  const ow = Math.max(48, r * 3.2), oh = r * 1.7;
+  rrect(ctx, out.x - ow / 2, out.y - oh / 2, ow, oh, oh / 2);
+  ctx.fillStyle = T.ink; ctx.fill();
+  ctx.fillStyle = T.sunk; ctx.fillText("score", out.x, out.y + 0.5);
+}
+
+/* Shared isometric helpers for the in-progress projects, in an isometric style */
+const isoP = (cx, oy, k) => (x, y, z) => [cx + (x - y) * k * 0.866, oy + (x + y) * k * 0.5 - z * k];
+function isoFloor(ctx, P, N, T) {
+  const s0 = -N / 2;
+  for (let i = 0; i < Math.ceil(N); i++) for (let j = 0; j < Math.ceil(N); j++) {
+    const i1 = Math.min(i + 1, N), j1 = Math.min(j + 1, N);
+    poly(ctx, [P(s0 + i, s0 + j, 0), P(s0 + i1, s0 + j, 0), P(s0 + i1, s0 + j1, 0), P(s0 + i, s0 + j1, 0)], (i + j) % 2 ? T.surface : T.line);
+  }
+}
+function isoBlock(ctx, P, m, fill, T, topFill) {
+  const z0 = m.z || 0, z1 = z0 + m.dz;
+  if (!z0) poly(ctx, [P(m.x + m.dx, m.y, 0), P(m.x + m.dx + 0.25, m.y + 0.2, 0), P(m.x + m.dx + 0.25, m.y + m.dy + 0.2, 0), P(m.x + m.dx, m.y + m.dy, 0)], "rgba(0,0,0,.12)");
+  const top = [P(m.x, m.y, z1), P(m.x + m.dx, m.y, z1), P(m.x + m.dx, m.y + m.dy, z1), P(m.x, m.y + m.dy, z1)];
+  const right = [P(m.x + m.dx, m.y, z0), P(m.x + m.dx, m.y + m.dy, z0), P(m.x + m.dx, m.y + m.dy, z1), P(m.x + m.dx, m.y, z1)];
+  const front = [P(m.x, m.y + m.dy, z0), P(m.x + m.dx, m.y + m.dy, z0), P(m.x + m.dx, m.y + m.dy, z1), P(m.x, m.y + m.dy, z1)];
+  [[right, 0.14, fill], [front, 0.06, fill], [top, 0, topFill || fill]].forEach(([f, a, c]) => {
+    poly(ctx, f, c); if (a) poly(ctx, f, `rgba(0,0,0,${a})`); poly(ctx, f, null, T.muted, 1);
+  });
+}
+function isoCyl(ctx, P, x0, y0, r, z0, z1, side, top, T) {
+  const ell = z => Array.from({ length: 33 }, (_, i) => { const t = (-0.25 + i / 32) * Math.PI * 2; return [t, P(x0 + r * Math.cos(t), y0 + r * Math.sin(t), z)]; });
+  const fr = t => t >= -Math.PI / 4 && t <= Math.PI * 0.75;
+  poly(ctx, ell(z0).filter(([t]) => fr(t)).map(([, p]) => p).concat(ell(z1).filter(([t]) => fr(t)).map(([, p]) => p).reverse()), side, T.muted, 0.8);
+  poly(ctx, ell(z1).map(([, p]) => p), top, T.muted, 0.8);
+}
+function isoTube(ctx, pts, col, lw, T) {
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+  const path = () => { ctx.beginPath(); pts.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); };
+  path(); ctx.strokeStyle = T.sunk; ctx.lineWidth = lw + 2; ctx.stroke();
+  path(); ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.stroke();
+  ctx.lineCap = "butt"; ctx.lineJoin = "miter";
+}
+function cardHead(ctx, T, a, b) {
+  ctx.font = `500 11px ${MONO}`; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = T.muted; ctx.fillText(a, 14, 22);
+  ctx.fillStyle = T.accent; ctx.fillText(b, 14, 38);
+}
+/* Two isometric scenes side by side with a caption under each */
+function isoDuo(ctx, w, h, T, H, draw) {
+  const N = 2.4, top = 46, foot = 26, wide = Math.min(w, h * 1.9), x0 = (w - wide) / 2;
+  const k = Math.min((wide / 2 - 18) / (2 * N * 0.866), (h - top - foot) / (N + H));
+  const oy = top + H * k + ((h - top - foot) - (N + H) * k) / 2 + N * k / 2;
+  [0, 1].forEach(i => {
+    const cx = x0 + wide * (i ? 0.75 : 0.25), P = isoP(cx, oy, k);
+    isoFloor(ctx, P, N, T);
+    const [label, hot] = draw(i, P, k, cx, oy);
+    ctx.font = `500 10.5px ${MONO}`; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = hot ? T.accent : T.muted; ctx.fillText(label, cx, h - 12);
+  });
+}
+
+/* Children's learning: the same desk and exercise, alone and with an AI assistant on a tablet */
+function artSeyes(ctx, w, h, T) {
+  ctx.fillStyle = T.sunk; ctx.fillRect(0, 0, w, h);
+  cardHead(ctx, T, "children · same task, two conditions", "what does the AI really add?");
+  isoDuo(ctx, w, h, T, 1.25, (i, P, k) => {
+    isoBlock(ctx, P, { x: -0.35, y: 0.55, dx: 0.6, dy: 0.45, dz: 0.3 }, T.line, T);                     // stool
+    isoBlock(ctx, P, { x: -0.85, y: -0.55, dx: 1.7, dy: 1.0, dz: 0.55 }, T.surface, T);                 // desk
+    const zt = 0.55;
+    isoBlock(ctx, P, { x: -0.65, y: -0.2, dx: 0.6, dy: 0.45, z: zt, dz: 0.04 }, T.surface, T, T.sunk);  // notebook
+    ctx.strokeStyle = T.muted; ctx.lineWidth = 0.8;
+    for (let r = 1; r <= 3; r++) seg(ctx, P(-0.6, -0.2 + r * 0.11, zt + 0.04), P(-0.1, -0.2 + r * 0.11, zt + 0.04));
+    isoTube(ctx, [P(-0.05, 0.05, zt + 0.05), P(0.2, 0.2, zt + 0.05)], T.ink, Math.max(2, k * 0.05), T);   // pencil
+    if (!i) return ["alone", false];
+    isoBlock(ctx, P, { x: 0.15, y: -0.45, dx: 0.55, dy: 0.4, z: zt, dz: 0.05 }, T.ink, T, T.accent);   // tablet
+    const q = P(0.42, -0.25, zt + 0.05), fs = Math.max(9.5, Math.min(12, k * 0.2));
+    ctx.font = `600 ${fs}px ${MONO}`;
+    const t = "try 7 × 4 first", bw = ctx.measureText(t).width + 14, bh = fs * 1.9;
+    const bx = Math.max(q[0] - bw * 0.3, q[0] - bw + 8), by = Math.max(46, q[1] - k * 0.7 - bh);
+    rrect(ctx, bx, by, bw, bh, bh / 2); ctx.fillStyle = T.accentSoft; ctx.fill(); ctx.strokeStyle = T.accent; ctx.lineWidth = 1.3; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(q[0] - 5, by + bh - 0.5); ctx.lineTo(q[0], q[1] - k * 0.35); ctx.lineTo(q[0] + 6, by + bh - 0.5);
+    ctx.fillStyle = T.accentSoft; ctx.fill(); ctx.stroke();
+    ctx.fillStyle = T.accent; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(t, bx + bw / 2, by + bh / 2 + 0.5);
+    return ["with an AI assistant", true];
+  });
+}
+
+/* A solid half-cheetah in the isometric style: thick capsules with round joints, heading to the right of the card */
+const CHEETAH_RUN = { torso: [[-0.65, 0.82], [0.6, 0.82]], neck: [[0.6, 0.82], [0.85, 1.02]], head: [0.92, 1.06],
+  legs: [[[-0.65, 0.82], [-1.0, 0.48], [-0.72, 0.18], [-0.85, 0.02]], [[0.6, 0.82], [0.88, 0.5], [0.66, 0.2], [0.82, 0.02]]] };
+function isoCheetah(ctx, P, f, col, k, T) {
+  const Q = ([u, z]) => P(u / Math.SQRT2, -u / Math.SQRT2, z);
+  const sh = P(0, 0, 0);
+  ctx.fillStyle = "rgba(0,0,0,.22)"; ctx.beginPath(); ctx.ellipse(sh[0], sh[1], k * 1.05, k * 0.25, 0, 0, Math.PI * 2); ctx.fill();
+  const lw = Math.max(2.5, k * 0.16), joint = q => { ctx.beginPath(); ctx.arc(q[0], q[1], lw * 0.42, 0, Math.PI * 2); ctx.fillStyle = T.sunk; ctx.fill(); };
+  isoTube(ctx, f.legs[0].map(Q), col, lw, T); f.legs[0].slice(1, 3).map(Q).forEach(joint);
+  isoTube(ctx, f.torso.map(Q), col, lw * 2.1, T);
+  isoTube(ctx, f.neck.map(Q), col, lw * 1.2, T);
+  isoTube(ctx, f.legs[1].map(Q), col, lw, T); f.legs[1].slice(1, 3).map(Q).forEach(joint);
+  const hd = Q(f.head), r = lw * 1.2;
+  ctx.beginPath(); ctx.arc(hd[0], hd[1], r, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = T.sunk; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(hd[0] - r * 0.3, hd[1] - r * 0.3, r * 0.35, 0, Math.PI * 2); ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fill();
+  return Q;
+}
+const arrowTo = (ctx, x, y, ang) => {
+  ctx.beginPath(); ctx.moveTo(x, y);
+  ctx.lineTo(x - 7 * Math.cos(ang - 0.45), y - 7 * Math.sin(ang - 0.45)); ctx.lineTo(x - 7 * Math.cos(ang + 0.45), y - 7 * Math.sin(ang + 0.45));
+  ctx.closePath(); ctx.fill();
+};
+
+/* LLM reward: the reward code next to a contact sheet of the trained run that the LLM looks at.
+   The last frame is a reward hack, the cheetah on its back. */
+const CHEETAH_RUN2 = { torso: [[-0.65, 0.8], [0.6, 0.8]], neck: [[0.6, 0.8], [0.85, 1.0]], head: [0.92, 1.04],
+  legs: [[[-0.65, 0.8], [-0.4, 0.48], [-0.6, 0.18], [-0.45, 0.02]], [[0.6, 0.8], [0.4, 0.5], [0.62, 0.2], [0.5, 0.02]]] };
+const CHEETAH_FLIP = { torso: [[-0.65, 0.16], [0.6, 0.16]], neck: [[0.6, 0.16], [0.85, 0.08]], head: [0.95, 0.07],
+  legs: [[[-0.65, 0.16], [-0.95, 0.48], [-0.7, 0.8], [-0.85, 0.98]], [[0.6, 0.16], [0.85, 0.5], [0.62, 0.82], [0.78, 1.0]]] };
+function artLoop(ctx, w, h, T) {
+  ctx.fillStyle = T.sunk; ctx.fillRect(0, 0, w, h);
+  cardHead(ctx, T, "LLM-written reward · half-cheetah", "does seeing the robot help?");
+  const W = Math.min(w, h * 1.9), X = (w - W) / 2, top = 52, bot = h - 14;
+  // code sheet
+  const code = ["def reward(s, a):", "  v = s.forward_vel", "  e = (a ** 2).sum()", "  up = s.torso_up", "  return v - 0.1 * e"];
+  const cw = W * 0.42, fs = Math.round(Math.max(9, Math.min(12, (cw - 24) / 19))), lh = fs * 1.6;
+  const cx0 = X + 14, ch = Math.min(bot - top, code.length * lh + 30), cy0 = top + (bot - top - ch) / 2;
+  rrect(ctx, cx0, cy0, cw, ch, 8); ctx.fillStyle = T.surface; ctx.fill(); ctx.strokeStyle = T.line; ctx.lineWidth = 1.2; ctx.stroke();
+  ctx.font = `500 ${fs}px ${MONO}`; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  code.forEach((t, i) => {
+    const y = cy0 + 15 + lh * (i + 0.5);
+    if (!i) { ctx.fillStyle = T.accent; ctx.fillText("def", cx0 + 12, y); ctx.fillStyle = T.ink; ctx.fillText(t.slice(3), cx0 + 12 + ctx.measureText("def").width, y); }
+    else { ctx.fillStyle = i === 3 ? T.accent : T.ink; ctx.fillText(t, cx0 + 12, y); }
+  });
+  ctx.font = `600 10px ${MONO}`;
+  const tw = ctx.measureText("LLM").width + 14;
+  rrect(ctx, cx0 + cw - tw - 8, cy0 - 9, tw, 18, 9); ctx.fillStyle = T.accent; ctx.fill();
+  ctx.fillStyle = T.onAccent; ctx.textAlign = "center"; ctx.fillText("LLM", cx0 + cw - 8 - tw / 2, cy0 + 0.5);
+  // contact sheet, 2 x 2
+  const gx = cx0 + cw + Math.max(44, W * 0.11), gw = X + W - 14 - gx, gap = 6;
+  const fw = (gw - gap) / 2, fh = Math.min((bot - top - gap) / 2, fw * 0.72), gy = top + (bot - top - (fh * 2 + gap)) / 2;
+  [CHEETAH_RUN, CHEETAH_RUN2, CHEETAH_RUN, CHEETAH_FLIP].forEach((pose, i) => {
+    const fx = gx + (i % 2) * (fw + gap), fy = gy + Math.floor(i / 2) * (fh + gap), hack = i === 3;
+    ctx.save(); rrect(ctx, fx, fy, fw, fh, 6); ctx.fillStyle = T.surface; ctx.fill(); ctx.clip();
+    const N = 2.4, k = Math.min(fw / (2 * N * 0.866) * 0.85, fh / (N + 1.7)), P = isoP(fx + fw / 2, fy + fh * 0.64, k);
+    isoFloor(ctx, P, N, T);
+    isoCheetah(ctx, P, pose, hack ? T.accent : T.ink, k, T);
+    ctx.restore();
+    rrect(ctx, fx, fy, fw, fh, 6); ctx.strokeStyle = hack ? T.accent : T.line; ctx.lineWidth = hack ? 1.5 : 1; ctx.stroke();
+    ctx.font = `500 9.5px ${MONO}`; ctx.textAlign = "left"; ctx.textBaseline = "top"; ctx.fillStyle = hack ? T.accent : T.muted;
+    ctx.fillText(hack ? "hack?" : `t=${[1, 2, 3][i]}`, fx + 6, fy + 5);
+  });
+  // the LLM looks at the frames: eye between the sheet and the code, arrow to the code
+  const ex = (cx0 + cw + gx) / 2, ey = cy0 + ch / 2, er = Math.max(9, Math.min(14, (gx - cx0 - cw) * 0.28));
+  ctx.beginPath(); ctx.moveTo(ex - er * 1.6, ey); ctx.quadraticCurveTo(ex, ey - er * 1.5, ex + er * 1.6, ey); ctx.quadraticCurveTo(ex, ey + er * 1.5, ex - er * 1.6, ey);
+  ctx.fillStyle = T.surface; ctx.fill(); ctx.strokeStyle = T.accent; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(ex, ey, er * 0.55, 0, Math.PI * 2); ctx.fillStyle = T.accent; ctx.fill();
+  ctx.beginPath(); ctx.arc(ex, ey, er * 0.22, 0, Math.PI * 2); ctx.fillStyle = T.surface; ctx.fill();
+  ctx.strokeStyle = T.accent; ctx.fillStyle = T.accent; ctx.lineWidth = 1.3;
+  seg(ctx, [ex - er * 1.7, ey], [cx0 + cw + 8, ey]); arrowTo(ctx, cx0 + cw + 3, ey, Math.PI);
+  ctx.setLineDash([2, 3]); seg(ctx, [ex + er * 1.7, ey], [gx - 4, ey]); ctx.setLineDash([]);
+}
+
+/* VLA: a Franka-like arm over a table, the instruction it receives, and the shifts the study applies */
+function artDose(ctx, w, h, T) {
+  ctx.fillStyle = T.sunk; ctx.fillRect(0, 0, w, h);
+  cardHead(ctx, T, "SmolVLA · LIBERO · Franka arm", "where does it break?");
+  const N = 3.2, H = 2.1, top = 48, foot = 34, wide = Math.min(w, h * 1.9), x0 = (w - wide) / 2;
+  const k = Math.min((wide * 0.6) / (2 * N * 0.866), (h - top - foot) / (N + H));
+  const cx = x0 + wide * 0.36, oy = top + H * k + ((h - top - foot) - (N + H) * k) / 2 + N * k / 2;
+  const P = isoP(cx, oy, k);
+  isoFloor(ctx, P, N, T);
+  isoBlock(ctx, P, { x: -1.15, y: -0.9, dx: 2.3, dy: 1.8, dz: 0.85 }, T.surface, T);                     // table
+  const zt = 0.85;
+  isoCyl(ctx, P, 0.45, 0.35, 0.36, zt, zt + 0.03, T.surface, T.sunk, T);                                 // plate
+  isoCyl(ctx, P, -0.45, 0.0, 0.26, zt, zt + 0.2, T.accent, T.accentSoft, T);                            // bowl
+  // planned motion, bowl to plate
+  const m0 = P(-0.45, 0.0, zt + 0.45), m1 = P(0.45, 0.35, zt + 0.3), mc = P(0.0, 0.17, zt + 0.95);
+  ctx.strokeStyle = T.accent; ctx.lineWidth = 1.3; ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(m0[0], m0[1]); ctx.quadraticCurveTo(mc[0], mc[1], m1[0], m1[1]); ctx.stroke(); ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(m1[0], m1[1]); ctx.lineTo(m1[0] - 8, m1[1] - 3); ctx.lineTo(m1[0] - 3, m1[1] - 8); ctx.closePath(); ctx.fillStyle = T.accent; ctx.fill();
+  // arm: base, shoulder, elbow, wrist, gripper
+  isoCyl(ctx, P, 0.75, -0.6, 0.2, zt, zt + 0.16, T.ink, T.muted, T);
+  const lw = Math.max(5, k * 0.17);
+  const j = [P(0.75, -0.6, zt + 0.16), P(0.75, -0.6, zt + 0.95), P(0.05, -0.35, zt + 1.25), P(-0.42, -0.05, zt + 0.85)];
+  isoTube(ctx, j, T.ink, lw, T);
+  j.slice(1).forEach(q => { ctx.beginPath(); ctx.arc(q[0], q[1], lw * 0.55, 0, Math.PI * 2); ctx.fillStyle = T.sunk; ctx.fill(); });
+  const g0 = P(-0.42, -0.05, zt + 0.85);
+  isoTube(ctx, [P(-0.52, -0.05, zt + 0.82), P(-0.52, -0.05, zt + 0.55)], T.ink, lw * 0.5, T);
+  isoTube(ctx, [P(-0.32, -0.05, zt + 0.82), P(-0.32, -0.05, zt + 0.55)], T.ink, lw * 0.5, T);
+  isoTube(ctx, [P(-0.52, -0.05, zt + 0.82), P(-0.32, -0.05, zt + 0.82)], T.ink, lw * 0.6, T);
+  // instruction bubble, pointing at the arm
+  const fs = Math.round(Math.max(10, Math.min(12, wide * 0.024)));
+  ctx.font = `500 ${fs}px ${MONO}`;
+  const bx0 = x0 + wide * 0.64, maxW = x0 + wide - 14 - bx0, pad = fs * 0.8, lh = fs * 1.35, lines = [""];
+  "“put the bowl on the plate”".split(" ").forEach(wd => {
+    const t = lines[lines.length - 1] ? lines[lines.length - 1] + " " + wd : wd;
+    if (ctx.measureText(t).width > maxW - pad * 2 && lines[lines.length - 1]) lines.push(wd); else lines[lines.length - 1] = t;
+  });
+  const bw = Math.min(maxW, Math.max(...lines.map(t => ctx.measureText(t).width)) + pad * 2), bh = lines.length * lh + pad;
+  const by = top + 8;
+  rrect(ctx, bx0, by, bw, bh, 8); ctx.fillStyle = T.surface; ctx.fill(); ctx.strokeStyle = T.muted; ctx.lineWidth = 1.1; ctx.stroke();
+  ctx.fillStyle = T.ink; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  lines.forEach((t, i) => ctx.fillText(t, bx0 + pad, by + pad / 2 + lh * (i + 0.5)));
+  ctx.strokeStyle = T.muted; ctx.lineWidth = 1; ctx.setLineDash([2, 3]);
+  seg(ctx, [bx0, by + bh / 2], [j[2][0] + lw, j[2][1]]); ctx.setLineDash([]);
+  // perturbations studied
+  const chips = ["camera shift", "lighting", "start pose"];
+  ctx.font = `500 10px ${MONO}`; let cx2 = bx0, cy2 = by + bh + 14;
+  chips.forEach(t => {
+    const cw = ctx.measureText(t).width + 14;
+    if (cx2 + cw > x0 + wide - 14) { cx2 = bx0; cy2 += 24; }
+    rrect(ctx, cx2, cy2, cw, 18, 9); ctx.fillStyle = T.accentSoft; ctx.fill();
+    ctx.fillStyle = T.accent; ctx.textBaseline = "middle"; ctx.fillText(t, cx2 + 7, cy2 + 9.5);
+    cx2 += cw + 6;
+  });
+}
+
+const ARTS = { graph: artGraph, seyes: artSeyes, loop: artLoop, dose: artDose };
+
+function drawCanvas(c) {
+  const fn = ARTS[c.dataset.art];
+  if (!fn) return;
+  const r = c.getBoundingClientRect();
+  const w = Math.round(r.width), h = Math.round(r.height);
+  if (w < 2 || h < 2) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  c.width = w * dpr; c.height = h * dpr;
+  const ctx = c.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  fn(ctx, w, h, tokens());
+}
+const drawAll = () => document.querySelectorAll("canvas[data-art]").forEach(drawCanvas);
+const ro = "ResizeObserver" in window ? new ResizeObserver(es => es.forEach(e => drawCanvas(e.target))) : null;
+function observeCanvases() {
+  if (ro) { ro.disconnect(); document.querySelectorAll("canvas[data-art]").forEach(c => ro.observe(c)); }
+  requestAnimationFrame(drawAll);
+}
+
+/* redraw when the theme changes */
+const mq = window.matchMedia("(prefers-color-scheme: dark)");
+if (mq.addEventListener) mq.addEventListener("change", drawAll);
+new MutationObserver(drawAll).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+window.addEventListener("resize", () => requestAnimationFrame(() => { drawAll(); fitKeywords(); }));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitKeywords);
+
+renderHome();
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>

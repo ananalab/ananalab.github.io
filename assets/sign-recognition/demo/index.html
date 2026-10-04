@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign recognition demo</title>
+  <meta name="description" content="Isolated sign recognition from MediaPipe landmarks, running entirely in your browser." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23222'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <main class="layout">
+    <div class="topbar">
+      <div class="segmented" id="model-picker" role="radiogroup" aria-label="Model"></div>
+      <span class="status" id="status"><span class="dot"></span><span id="status-text">Loading…</span></span>
+    </div>
+
+    <section class="stage-col">
+      <div class="stage" id="stage">
+        <video id="video" playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div class="stage-empty" id="stage-empty">
+          <div class="empty-card">
+            <p>Video stays on your device.</p>
+            <button class="btn primary" id="btn-camera-big">Start camera</button>
+            <button class="btn link" id="btn-file-big">Analyse a video file</button>
+            <button class="btn link" id="btn-example-big" hidden>Replay an LSFB example</button>
+          </div>
+        </div>
+        <div class="hud">
+          <span id="hud-fps">— fps</span>
+          <span id="hud-lat"></span>
+        </div>
+        <div class="state-badge" id="state-badge" data-state="idle">Waiting for hands</div>
+        <div class="rec-bar"><div class="rec-fill" id="rec-fill"></div></div>
+      </div>
+
+      <div class="controls">
+        <div class="segmented" id="mode-picker" role="radiogroup" aria-label="Capture mode">
+          <button role="radio" data-mode="auto" aria-checked="true">Auto</button>
+          <button role="radio" data-mode="hold" aria-checked="false">Hold <kbd>Space</kbd></button>
+          <button role="radio" data-mode="file" aria-checked="false">Video file</button>
+        </div>
+        <div class="controls-right">
+          <label class="toggle"><input type="checkbox" id="opt-skeleton" checked />Skeleton</label>
+          <label class="toggle"><input type="checkbox" id="opt-mirror" checked />Mirror</label>
+          <button class="btn" id="btn-example" hidden>Example</button>
+          <button class="btn" id="btn-camera">Start camera</button>
+          <input type="file" id="file-input" accept="video/*" hidden />
+        </div>
+      </div>
+    </section>
+
+    <aside class="side-col">
+      <section class="block prediction" id="prediction">
+        <div class="block-head"><h3>Prediction</h3><span class="muted" id="pred-meta"></span></div>
+        <div class="top1">
+          <span class="gloss" id="top1-gloss">—</span>
+          <span class="conf" id="top1-conf"></span>
+        </div>
+        <div class="muted" id="top1-hint">Sign something to see the model's guess.</div>
+        <ol class="bars" id="bars"></ol>
+      </section>
+
+      <section class="block">
+        <div class="block-head"><h3>Signs to try</h3></div>
+        <div class="chips" id="easy-grid"></div>
+        <p class="muted" id="easy-note"></p>
+      </section>
+
+      <section class="block">
+        <div class="block-head"><h3>Recognised</h3><button class="btn link" id="btn-clear">Clear</button></div>
+        <div class="chips" id="history"><span class="muted">Nothing yet.</span></div>
+      </section>
+
+      <section class="block vocab">
+        <div class="block-head"><h3>Vocabulary <span class="muted" id="vocab-count"></span></h3></div>
+        <input type="search" id="vocab-search" placeholder="Search a sign…" autocomplete="off" />
+        <div class="chips scroll" id="vocab-grid"></div>
+        <p class="muted" id="vocab-note"></p>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    Isolated sign recognition from a fixed vocabulary, not translation.
+    Models: <span id="footer-models"></span>.
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
