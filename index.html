@@ -255,7 +255,7 @@ const PROJECTS = [
     featured: true,
     title: "Real-to-Sim",
     year: "2026",
-    context: "Research project · ISIR",
+    context: "Academic research project · ISIR",
     status: "done",
     blurb: "A pipeline that turns a prompt or an RGB photo into a physically consistent 3D scene for the Genesis simulator using LLMs and VLMs, checked by a physics and semantic validation loop.",
     art: "scene",
@@ -338,7 +338,7 @@ const PROJECTS = [
     id: "qd-damage",
     title: "Damage recovery for a four-legged robot",
     year: "2026",
-    context: "Independent project",
+    context: "Independent research project",
     status: "done",
     blurb: "A simulated quadruped loses the use of a leg. Using a repertoire of gaits learned in advance, it finds a new way to walk in a handful of trials, where re-training with reinforcement learning needs hundreds of episodes. This behavior mimics that of injured animals and was first introduced by Cully et al. (Nature 2015) as Intelligent Trial & Error.",
     art: "duo",
@@ -405,7 +405,7 @@ const PROJECTS = [
     id: "birdclef",
     title: "Species sound classification with classical ML",
     year: "2026",
-    context: "Master's project · Sorbonne University",
+    context: "Academic research project · Sorbonne University",
     status: "done",
     blurb: "Multi-label recognition of Pantanal wildlife sounds for the BirdCLEF+ 2026 Kaggle competition: hand-crafted acoustic features against frozen pre-trained embeddings, and how much field noise degrades both.",
     art: "world",
@@ -512,7 +512,7 @@ const PROJECTS = [
     id: "sign-recognition",
     title: "Real-time sign recognition with a CNN, from ASL to French Belgian Sign Language",
     year: "2026",
-    context: "Independent project",
+    context: "Independent research project",
     status: "done",
     blurb: "Recognition of isolated signs from a webcam, in real time and entirely in the browser, from body, hand and lip landmarks. Evaluation on signers never seen during training, and study of transfer from American Sign Language (ASL) to French Belgian Sign Language (LSFB).",
     art: "hand",
@@ -617,7 +617,7 @@ const PROJECTS = [
     id: "llm-reward",
     title: "Can an LLM write a robot's reward?",
     year: "2026",
-    context: "Independent project",
+    context: "Independent research project",
     status: "ongoing",
     blurb: "A language model writes the reward functions used to train a simulated robot with reinforcement learning, and improves them from feedback. Does seeing images of the robot help it correct its mistakes?",
     art: "loop",
@@ -643,7 +643,7 @@ const PROJECTS = [
     id: "vla-robustness",
     title: "Stress-testing a vision-language-action model",
     year: "2026",
-    context: "Independent project",
+    context: "Independent research project",
     status: "ongoing",
     blurb: "A robot model that turns a camera image and an instruction into arm motions: how does it fail when conditions drift from its training data, and can a small correction learned by reinforcement learning compensate?",
     art: "dose",
@@ -670,7 +670,7 @@ const PROJECTS = [
     id: "ai-learning",
     title: "Measuring AI assistance in children's learning",
     year: "2026–27",
-    context: "Master's team project · Sorbonne University",
+    context: "Academic research project · Sorbonne University",
     status: "ongoing",
     blurb: "How much does an AI assistant really change what children achieve on a learning task? A controlled study that compares children working with and without the assistant.",
     art: "seyes",
@@ -719,7 +719,7 @@ const linkOrgs = s => s.replace(/\b(ISIR|IRIT|ISAE-Supaero)\b(?![^<]*<\/a>)/g, m
 
 function metaHTML(p, linked) {
   const pill = { ongoing: "In progress", planned: "Planned" }[p.status];
-  return `<p class="meta">${pill ? `<span class="pill">${pill}</span>` : ""}<span>${p.year}</span><span aria-hidden="true">·</span><span>${linked ? linkOrgs(p.context) : p.context}</span></p>`;
+  return `<p class="meta">${pill ? `<span class="pill">${pill}</span>` : ""}${linked ? `<span>${p.year}</span><span aria-hidden="true">·</span><span>${linkOrgs(p.context)}</span>` : `<span>${p.context}</span>`}</p>`;
 }
 
 function renderHome() {
