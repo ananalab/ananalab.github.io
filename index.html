@@ -987,13 +987,19 @@ function artSeyes(ctx, w, h, T) {
   ctx.fillStyle = T.sunk; ctx.fillRect(0, 0, w, h);
   cardHead(ctx, T, "children · same task, two conditions", "what does the AI really add?");
   isoDuo(ctx, w, h, T, 1.25, (i, P, k) => {
-    isoBlock(ctx, P, { x: -0.35, y: 0.55, dx: 0.6, dy: 0.45, dz: 0.3 }, T.line, T);                     // stool
     isoBlock(ctx, P, { x: -0.85, y: -0.55, dx: 1.7, dy: 1.0, dz: 0.55 }, T.surface, T);                 // desk
     const zt = 0.55;
     isoBlock(ctx, P, { x: -0.65, y: -0.2, dx: 0.6, dy: 0.45, z: zt, dz: 0.04 }, T.surface, T, T.sunk);  // notebook
     ctx.strokeStyle = T.muted; ctx.lineWidth = 0.8;
     for (let r = 1; r <= 3; r++) seg(ctx, P(-0.6, -0.2 + r * 0.11, zt + 0.04), P(-0.1, -0.2 + r * 0.11, zt + 0.04));
     isoTube(ctx, [P(-0.05, 0.05, zt + 0.05), P(0.2, 0.2, zt + 0.05)], T.ink, Math.max(2, k * 0.05), T);   // pencil
+    // chair: four legs, a seat and a backrest on the side facing away from the desk
+    const cx0 = -0.3, cy0 = 0.6, cw = 0.5, cd = 0.42, seat = 0.3, leg = 0.045;
+    [[cx0, cy0], [cx0 + cw - leg, cy0], [cx0, cy0 + cd - leg], [cx0 + cw - leg, cy0 + cd - leg]]
+      .forEach(([x, y]) => isoBlock(ctx, P, { x, y, dx: leg, dy: leg, dz: seat }, T.line, T));
+    isoBlock(ctx, P, { x: cx0 - 0.02, y: cy0 - 0.02, dx: cw + 0.04, dy: cd + 0.04, z: seat, dz: 0.05 }, T.surface, T);
+    [cx0, cx0 + cw - leg].forEach(x => isoBlock(ctx, P, { x, y: cy0 + cd - leg, dx: leg, dy: leg, z: seat + 0.05, dz: 0.4 }, T.line, T));
+    isoBlock(ctx, P, { x: cx0 - 0.02, y: cy0 + cd - leg, dx: cw + 0.04, dy: leg, z: seat + 0.27, dz: 0.18 }, T.surface, T);
     if (!i) return ["alone", false];
     isoBlock(ctx, P, { x: 0.15, y: -0.45, dx: 0.55, dy: 0.4, z: zt, dz: 0.05 }, T.ink, T, T.accent);   // tablet
     const q = P(0.42, -0.25, zt + 0.05), fs = Math.max(9.5, Math.min(12, k * 0.2));
