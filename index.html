@@ -149,7 +149,7 @@ p.scene-in{max-width:42%;margin:0;padding:6px 9px;background:rgba(255,255,255,.8
 .shot.medium{max-width:480px}
 .vids{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .vid{margin:0;display:grid;gap:6px;min-width:0}
-.vid video{display:block;width:100%;aspect-ratio:640/434;object-fit:cover;border:1px solid var(--line);border-radius:var(--radius);background:#fff}
+.vid video,.vid img{display:block;width:100%;aspect-ratio:640/434;object-fit:cover;border:1px solid var(--line);border-radius:var(--radius);background:#fff}
 .vid figcaption{display:grid;gap:1px;font-family:var(--mono);font-size:12px;line-height:1.4}
 .vid figcaption b{font-weight:500;color:var(--ink)}
 .vid figcaption span{color:var(--muted)}
@@ -161,6 +161,8 @@ p.scene-in{max-width:42%;margin:0;padding:6px 9px;background:rgba(255,255,255,.8
 .shots2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
 .shots2 .shot{max-width:none}
 @media (max-width:680px){.shots2{grid-template-columns:minmax(0,1fr)}}
+/* Two GIFs of different aspect ratios: columns proportional to their widths so both share one height */
+@media (min-width:681px){.shots2.rollouts{grid-template-columns:minmax(0,876fr) minmax(0,582fr)}}
 .tbl-wrap{max-width:66ch;overflow-x:auto}
 .tbl{width:100%;border-collapse:collapse;font-size:15px;line-height:1.4}
 .tbl th{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:0 12px 8px 0;border-bottom:1px solid var(--line)}
@@ -335,6 +337,81 @@ const PROJECTS = [
     ]
   },
   {
+    id: "vla-robustness",
+    title: "Stress-testing a vision-language-action model",
+    year: "2026",
+    context: "Independent research project",
+    status: "done",
+    blurb: "A robot model turns a camera image and an instruction into arm motions. Does it actually listen to the instruction, and how does it break when the scene drifts from its training data? A study of SmolVLA over 2,439 simulated episodes, and a residual corrector trained by reinforcement learning on top of the frozen model.",
+    art: "dose",
+    media: { type: "image", src: "assets/vla-robustness/thumb.gif", alt: "" },
+    hero: {
+      html: `<div class="vids four">
+        <figure class="vid"><img src="assets/vla-robustness/listen.gif" alt="The robot opens the middle drawer when told to, in a scene set up for another task" loading="lazy"><figcaption><b>Told: “open the middle drawer”</b><span>in a scene set up for another task - success</span></figcaption></figure>
+        <figure class="vid"><img src="assets/vla-robustness/camera.gif" alt="Main camera rotated by 22.5 degrees: the bowl ends next to the plate" loading="lazy"><figcaption><b>Camera rotated 22.5°</b><span>bowl put down next to the plate - failure</span></figcaption></figure>
+        <figure class="vid"><img src="assets/vla-robustness/arm.gif" alt="Arm starting 0.1 radian away from its usual pose on each joint: the bowl is never grasped" loading="lazy"><figcaption><b>Arm offset 0.1 rad per joint</b><span>objects unchanged, bowl never grasped - failure</span></figcaption></figure>
+        <figure class="vid"><img src="assets/vla-robustness/residual.gif" alt="With the residual corrector, an episode the model alone fails is completed" loading="lazy"><figcaption><b>VLA + residual corrector</b><span>offset 0.05 rad, a start seen in training - rescued</span></figcaption></figure>
+      </div>`,
+      caption: "What SmolVLA sees from its main camera in four LIBERO episodes. The second and third clips replay the same episode as an unperturbed success, with only the camera or the arm's starting pose changed."
+    },
+    tags: ["VLA", "Robustness", "Residual RL", "Evaluation"],
+    tools: ["Python", "PyTorch", "LeRobot", "LIBERO", "MuJoCo", "PPO"],
+    keywords: ["Vision-language-action models", "SmolVLA", "Language grounding", "Distribution shift", "Dose-response curves", "Robustness evaluation", "Residual reinforcement learning", "PPO", "LIBERO", "Wilson intervals"],
+    facts: [
+      ["Model", "SmolVLA, 450M parameters (checkpoint lerobot/smolvla_libero)"],
+      ["Benchmark", "LIBERO, simulated Franka arm in MuJoCo"],
+      ["Scale", "2,439 episodes, about 29 hours of compute on a laptop (Apple M1, 8 GB)"]
+    ],
+    sections: [
+      { h: "Question", html: `<p>Vision-language-action (VLA) models receive a camera image and an instruction such as “put the bowl on the plate”, and directly output the motions of a robot arm. On simulation benchmarks they now succeed most of the time, which says little about two things that matter once the robot leaves the benchmark: is the instruction actually used, and what happens when the scene is slightly different from the demonstrations?</p>
+        <p>The project studies a small open model, SmolVLA, with three questions: does it listen, how does its success degrade as a perturbation grows, and can a small policy trained by reinforcement learning repair one of its weaknesses without retraining the model?</p>` },
+      { h: "Approach", html: `<ul>
+        <li><strong>Listening test.</strong> In LIBERO-Goal, ten tasks share the same scene and objects. The robot is placed in the scene of one task and given the instruction of another, and the goals of all ten tasks are checked at every step, so the test tells “ignores the instruction” apart from “follows it but fails”. Hand-written paraphrases, an empty instruction and an unrelated one complete it.</li>
+        <li><strong>Graded perturbations.</strong> Camera rotation around the scene, offset of the arm's starting pose, dimmed lighting, pixel noise and camera masking, each with a continuous intensity. For each one, a dose-response curve and a breaking point, the intensity at which success is halved, with a bootstrap over tasks for its uncertainty.</li>
+        <li><strong>Residual RL.</strong> A small network sees the arm's state and the action proposed by the frozen VLA, and adds a bounded correction. Its last layer starts at zero, so before training it reproduces the VLA exactly. It is trained with PPO on 40 starting configurations and tested on 10 others.</li>
+        <li><strong>Rigour.</strong> Every condition is run on the same episodes (same starting state and random seed), one CSV row per episode, Wilson intervals and paired tests, a cross-check against the official LeRobot evaluation, and determinism checks down to the exact episode length.</li>
+      </ul>
+      <figure class="shot">
+        <a href="assets/vla-robustness/perturbation_grid.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/perturbation_grid.png" alt="Grid of images from the robot's main camera at five intensities for four perturbations: camera orbit, arm starting pose, lighting and pixel noise." loading="lazy"></a>
+        <figcaption>What the policy sees at five intensities of each perturbation. At the strongest level every object stays visible to a human, except in the darkest lighting.</figcaption>
+      </figure>` },
+      { h: "Results", html: `<div class="figs">
+          <div class="fig"><b>73% vs 0%</b><span>of episodes reach the goal of the instruction given, against the goal of the scene the robot was placed in: it listens</span></div>
+          <div class="fig"><b>23% vs 80%</b><span>success with hand-written paraphrases against the original wording: it listens to the exact words</span></div>
+          <div class="fig"><b>≈ 3°</b><span>of offset per arm joint at the start is enough to halve success, although the objects have not moved</span></div>
+          <div class="fig"><b>14/20 vs 10/20</b><span>for the residual corrector on starts seen in training, but no gain on unseen ones, over three seeds</span></div>
+        </div>
+        <ul>
+          <li><strong>The instruction selects the task, like a key.</strong> Told to do another task of the same scene, the robot never completes the scene's own task (0/270) and completes the one it was told in 73% of cases. Rewording the same instruction breaks it, and an empty or unrelated instruction gives 0/50: without a wording it recognises, it does nothing useful.</li>
+          <li><strong>It breaks in different ways.</strong> Success declines gradually with the camera angle (halved around 40°), but falls off a cliff for lighting and pixel noise after a long plateau, and has only a narrow tolerance to the arm's starting pose. A single perturbation level per axis would have hidden these differences.</li>
+          <li><strong>The corrector learns, but does not generalise.</strong> It rescues starting configurations it was trained on and makes successful episodes about 20% shorter, but does not help on new configurations. With only proprioception and 40 training starts, it has little to generalise from.</li>
+        </ul>
+        <figure class="shot wide">
+          <a href="assets/vla-robustness/language_matrix.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/language_matrix.png" alt="Two ten-by-ten matrices: on the left, success only on the diagonal; on the right, the instructed goal reached in most cells." loading="lazy"></a>
+          <figcaption>Listening test, 300 episodes. Left: the goal of the scene is reached only when the instruction matches it. Right: the goal of the instruction actually given is reached in most cases, whatever the scene.</figcaption>
+        </figure>
+        <figure class="shot wide">
+          <a href="assets/vla-robustness/dose_response.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/dose_response.png" alt="Four success-rate curves against perturbation intensity: a gradual decline for the camera, cliffs for the arm pose, lighting and noise." loading="lazy"></a>
+          <figcaption>Success against intensity on LIBERO-Spatial, 50 episodes per point, with individual tasks in grey and the breaking point with its bootstrap interval.</figcaption>
+        </figure>
+        <figure class="shot wide">
+          <a href="assets/vla-robustness/rl_residual.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/rl_residual.png" alt="Left, PPO training curves for three seeds; right, bar chart of success for the VLA alone and with the corrector on seen and unseen starting configurations." loading="lazy"></a>
+          <figcaption>Residual RL over three seeds: better than the VLA alone on starting configurations seen in training, not on held-out ones.</figcaption>
+        </figure>` },
+      { h: "Watch the rollouts", html: `<div class="shots2 rollouts">
+          <figure class="shot"><img src="assets/vla-robustness/language-grid.gif" width="876" height="674" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="Six instructions in the same scene" loading="lazy"><figcaption>One scene, six instructions: the robot does what it is told.</figcaption></figure>
+          <figure class="shot"><img src="assets/vla-robustness/residual-grid.gif" width="582" height="674" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="VLA alone and with the residual corrector, on a seen and a held-out starting configuration" loading="lazy"><figcaption>VLA alone and with the corrector. Top: a start seen in training, rescued. Bottom: a new start, where it is only faster.</figcaption></figure>
+        </div>` },
+      { h: "What is new", html: `<p>LIBERO-Plus and LIBERO-PRO (2025) already perturb LIBERO along many axes, at a few fixed levels, and conclude that VLAs largely ignore language. This project sweeps each perturbation continuously to look at the <em>shape</em> of the degradation, scores every goal of the shared scene instead of only the scene's own goal, which shows that SmolVLA does use the instruction, and tests a residual correction on the weakness that is visible in the robot's own state.</p>` },
+      { h: "My contribution", html: `<p>Solo project, from the question to the report. I ran LIBERO and SmolVLA natively on a MacBook (by skipping a Linux-only dependency), wrote a resumable evaluation loop on top of LeRobot's processors, implemented the perturbations and the goal-level listening test, found and fixed a silent bug where the camera and lighting changes never reached the images, wrote the statistics (Wilson intervals, McNemar tests, logistic and model-free breaking points with a task bootstrap), the residual RL environment and a single-file PPO, and generated every figure, table and number of the report from the per-episode logs.</p>` },
+      { h: "Limits", html: `<p>Simulation only, one model and one checkpoint, 3 to 10 episodes per condition. The measured baselines (59% on LIBERO-Spatial, 84% on LIBERO-Goal) are below the published ones, so conclusions are relative to them. The residual corrector was trained on one task with about 400 episodes per run, so its negative result says more about this budget than about residual RL in general.</p>` }
+    ],
+    links: [
+      { label: "Code", url: "https://github.com/ananalab/vla-stress-test" },
+      { label: "Report (PDF)", url: "assets/vla-robustness/report.pdf" }
+    ]
+  },
+  {
     id: "qd-damage",
     title: "Damage recovery for a four-legged robot",
     year: "2026",
@@ -345,9 +422,9 @@ const PROJECTS = [
     media: { type: "video", src: "assets/qd-damage/after-ite.mp4", poster: "assets/qd-damage/after-ite.jpg" },
     hero: {
       html: `<div class="vids">
-        <figure class="vid"><video src="assets/qd-damage/intact.mp4" poster="assets/qd-damage/intact.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Intact robot walking"></video><figcaption><b>1 · Intact</b><span>30.5 m in 12.5 s</span></figcaption></figure>
-        <figure class="vid"><video src="assets/qd-damage/damaged.mp4" poster="assets/qd-damage/damaged.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Robot with its front-right leg paralysed, using the same gait"></video><figcaption><b>2 · Front-right leg paralysed, same gait</b><span>3.0 m</span></figcaption></figure>
-        <figure class="vid"><video src="assets/qd-damage/after-ite.mp4" poster="assets/qd-damage/after-ite.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Damaged robot using the gait found by Intelligent Trial and Error"></video><figcaption><b>3 · After 6 trials of ITE</b><span>10.4 m</span></figcaption></figure>
+        <figure class="vid"><video src="assets/qd-damage/intact.mp4" poster="assets/qd-damage/intact.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Intact robot walking"></video><figcaption><b>1 - Intact</b><span>30.5 m in 12.5 s</span></figcaption></figure>
+        <figure class="vid"><video src="assets/qd-damage/damaged.mp4" poster="assets/qd-damage/damaged.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Robot with its front-right leg paralysed, using the same gait"></video><figcaption><b>2 - Front-right leg paralysed, same gait</b><span>3.0 m</span></figcaption></figure>
+        <figure class="vid"><video src="assets/qd-damage/after-ite.mp4" poster="assets/qd-damage/after-ite.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Damaged robot using the gait found by Intelligent Trial and Error"></video><figcaption><b>3 - After 6 trials of ITE</b><span>10.4 m</span></figcaption></figure>
       </div>`,
       caption: "The best gait of a DCRL-ME repertoire on the Brax Ant, followed by the camera. Paralysing the front-right leg leaves the robot almost on the spot, however after 6 trials, Intelligent Trial & Error picks another gait from the repertoire that walks three times further. Each clip is the median of 8 episodes."
     },
@@ -518,10 +595,10 @@ const PROJECTS = [
     media: { clips: ["clown", "hello", "thankyou", "aussi"].map(c => ({ src: `assets/sign-recognition/${c}.mp4`, poster: `assets/sign-recognition/${c}.jpg` })) },
     hero: {
       html: `<div class="vids four">
-        <figure class="vid"><video src="assets/sign-recognition/clown.mp4" poster="assets/sign-recognition/clown.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign clown"></video><figcaption><b>ASL · clown</b><span>99% recognised</span></figcaption></figure>
-        <figure class="vid"><video src="assets/sign-recognition/hello.mp4" poster="assets/sign-recognition/hello.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign hello"></video><figcaption><b>ASL · hello</b><span>56% recognised</span></figcaption></figure>
-        <figure class="vid"><video src="assets/sign-recognition/thankyou.mp4" poster="assets/sign-recognition/thankyou.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign thank you"></video><figcaption><b>ASL · thank you</b><span>56% recognised</span></figcaption></figure>
-        <figure class="vid"><video src="assets/sign-recognition/aussi.mp4" poster="assets/sign-recognition/aussi.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the LSFB sign AUSSI"></video><figcaption><b>LSFB · AUSSI (also)</b><span>90% recognised</span></figcaption></figure>
+        <figure class="vid"><video src="assets/sign-recognition/clown.mp4" poster="assets/sign-recognition/clown.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign clown"></video><figcaption><b>ASL - clown</b><span>99% recognised</span></figcaption></figure>
+        <figure class="vid"><video src="assets/sign-recognition/hello.mp4" poster="assets/sign-recognition/hello.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign hello"></video><figcaption><b>ASL - hello</b><span>56% recognised</span></figcaption></figure>
+        <figure class="vid"><video src="assets/sign-recognition/thankyou.mp4" poster="assets/sign-recognition/thankyou.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign thank you"></video><figcaption><b>ASL - thank you</b><span>56% recognised</span></figcaption></figure>
+        <figure class="vid"><video src="assets/sign-recognition/aussi.mp4" poster="assets/sign-recognition/aussi.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the LSFB sign AUSSI"></video><figcaption><b>LSFB - AUSSI (also)</b><span>90% recognised</span></figcaption></figure>
       </div>`,
       caption: "What the model sees: hands, upper body and lips extracted by MediaPipe Holistic. Below each sign, the share of its test clips recognised for signers never seen during training."
     },
@@ -636,33 +713,6 @@ const PROJECTS = [
     ],
     links: [
       { label: "Code", url: "https://github.com/ananalab/llm-reward-lab" }
-    ]
-  },
-  {
-    id: "vla-robustness",
-    title: "Stress-testing a vision-language-action model",
-    year: "2026",
-    context: "Independent research project",
-    status: "ongoing",
-    blurb: "A robot model that turns a camera image and an instruction into arm motions: how does it fail when conditions drift from its training data, and can a small correction learned by reinforcement learning compensate?",
-    art: "dose",
-    media: { caption: "Schematic illustration of the concept. The project is in progress." },
-    tags: ["VLA", "Robustness", "Residual RL"],
-    tools: ["Python", "PyTorch", "LeRobot", "LIBERO", "MuJoCo"],
-    keywords: ["Vision-language-action models", "SmolVLA", "Distribution shift", "Robustness evaluation", "Residual reinforcement learning", "LIBERO"],
-    facts: [
-      ["Status", "In progress"],
-      ["Model", "SmolVLA (450M parameters)"],
-      ["Benchmark", "LIBERO, simulated Franka arm"],
-      ["Format", "Solo project"]
-    ],
-    sections: [
-      { h: "Concept", html: `<p>Vision-language-action (VLA) models receive a camera image and a natural-language instruction, such as “put the bowl on the plate”, and directly output the motions of a robot arm. Their behaviour outside the conditions seen during training remains poorly understood.</p>
-        <p>The project studies a small open model, SmolVLA, in simulation: it checks whether the model actually follows the instruction, measures how its success rate degrades as perturbations such as a camera shift or a lighting change increase, and tests whether a small residual policy trained by reinforcement learning can repair one of these weaknesses without retraining the model.</p>` },
-      { h: "Status", html: `<p>In progress.</p>` }
-    ],
-    links: [
-      { label: "Code", url: "https://github.com/ananalab/vla-stress-test" }
     ]
   },
   {
