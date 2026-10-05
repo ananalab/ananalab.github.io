@@ -234,7 +234,10 @@ const PROFILE = {
   name: "Anaïs Azouaoui",
   available: "Seeking a 6-month research internship from March 2027",
   role: "Second-year Master's student in Algorithms, Artificial Intelligence, Interactions & Decision (AI2D) · Sorbonne Université, Paris",
-  bio: "I am a Master's student in AI and robotics at Sorbonne Université, working on how robots can learn and adapt, with evolutionary methods, Quality-Diversity and deep reinforcement learning. Recently, I have worked on turning text and photos into simulation-ready 3D scenes with language models, on damage recovery for a legged robot with Quality-Diversity and deep RL, and on interpretable machine learning for intensive care.",
+  bio: [
+    "I am a Master's student in AI and robotics at Sorbonne Université. I am broadly interested in robot learning, and in particular in how search can help robots discover diverse behaviours, adapt when something goes wrong, and reveal where learned policies fail. Most of my work relies on Quality-Diversity, evolutionary methods and reinforcement learning.",
+    "I have worked with the Institute of Intelligent Systems and Robotics (ISIR) on generating robot simulation scenes from text and photos with language models, and with the REVA team at the Toulouse Institute of Computer Science Research (IRIT) on interpretable models for intensive care with genetic programming."
+  ],
   interests: ["Quality-Diversity", "Evolutionary robotics", "LLM-guided evolutionary search", "Robot learning", "Reinforcement learning", "Vision-language-action models", "Computer vision", "3D generation"],
   links: [
     { label: "CV (PDF)", url: "assets/cv-anais-azouaoui.pdf" },
@@ -354,7 +357,7 @@ const PROJECTS = [
       </div>`,
       caption: "What SmolVLA sees from its main camera in four LIBERO episodes. The second and third clips replay the same episode as an unperturbed success, with only the camera or the arm's starting pose changed."
     },
-    tags: ["VLA", "Robustness", "Residual RL", "Evaluation"],
+    tags: ["VLA", "Robustness", "Language grounding", "Residual RL"],
     tools: ["Python", "PyTorch", "LeRobot", "LIBERO", "MuJoCo", "PPO"],
     keywords: ["Vision-language-action models", "SmolVLA", "Language grounding", "Distribution shift", "Dose-response curves", "Robustness evaluation", "Residual reinforcement learning", "PPO", "LIBERO", "Wilson intervals"],
     facts: [
@@ -781,7 +784,7 @@ function renderHome() {
       <div class="photo"><img src="${P.photo}" alt="Portrait of ${displayName()}"></div>
       <div><h1 class="name">${name}</h1><p class="role">${P.role}</p></div>
     </div>
-    <p class="bio">${P.bio}</p>
+    ${P.bio.map(b => `<p class="bio">${b}</p>`).join("")}
     <p class="interests"><b>Interests</b>${P.interests.map(i => `<span>${i}</span>`).join("")}</p>
     <nav class="links" aria-label="Links">${P.links.map(l => linkBtn(l, false)).join("")}</nav>
     </div>
