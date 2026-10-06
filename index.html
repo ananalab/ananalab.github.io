@@ -345,7 +345,7 @@ const PROJECTS = [
     year: "2026",
     context: "Independent research project",
     status: "done",
-    blurb: "A robot model turns a camera image and an instruction into arm motions. Does it actually listen to the instruction, and how does it break when the scene drifts from its training data? A study of SmolVLA over 2,439 simulated episodes, and a residual corrector trained by reinforcement learning on top of the frozen model.",
+    blurb: "A robot model turns a camera image and an instruction into arm motions. Does it actually listen to the instruction, and how does it break when the scene drifts from its training data? A study of SmolVLA over 3,435 simulated episodes: a listening test, graded perturbations, a Quality-Diversity search for failures that only appear when perturbations combine, and two ways to repair what breaks.",
     art: "dose",
     media: { type: "image", src: "assets/vla-robustness/thumb.gif", alt: "" },
     hero: {
@@ -363,15 +363,17 @@ const PROJECTS = [
     facts: [
       ["Model", "SmolVLA, 450M parameters (checkpoint lerobot/smolvla_libero)"],
       ["Benchmark", "LIBERO, simulated Franka arm in MuJoCo"],
-      ["Scale", "2,439 episodes, about 29 hours of compute on a laptop (Apple M1, 8 GB)"]
+      ["Scale", "3,435 episodes, about 39 hours of compute on a laptop (Apple M1, 8 GB)"]
     ],
     sections: [
       { h: "Question", html: `<p>Vision-language-action (VLA) models receive a camera image and an instruction such as “put the bowl on the plate”, and directly output the motions of a robot arm. On simulation benchmarks they now succeed most of the time, which says little about two things that matter once the robot leaves the benchmark: is the instruction actually used, and what happens when the scene is slightly different from the demonstrations?</p>
-        <p>The project studies a small open model, SmolVLA, with three questions: does it listen, how does its success degrade as a perturbation grows, and can a small policy trained by reinforcement learning repair one of its weaknesses without retraining the model?</p>` },
+        <p>The project studies a small open model, SmolVLA, with three questions: does it listen, how does its success degrade as a perturbation grows, alone or combined with others, and can its weaknesses be repaired without retraining the model?</p>` },
       { h: "Approach", html: `<ul>
         <li><strong>Listening test.</strong> In LIBERO-Goal, ten tasks share the same scene and objects. The robot is placed in the scene of one task and given the instruction of another, and the goals of all ten tasks are checked at every step, so the test tells “ignores the instruction” apart from “follows it but fails”. Hand-written paraphrases, an empty instruction and an unrelated one complete it.</li>
         <li><strong>Graded perturbations.</strong> Camera rotation around the scene, offset of the arm's starting pose, dimmed lighting, pixel noise and camera masking, each with a continuous intensity. For each one, a dose-response curve and a breaking point, the intensity at which success is halved, with a bootstrap over tasks for its uncertainty.</li>
-        <li><strong>Residual RL.</strong> A small network sees the arm's state and the action proposed by the frozen VLA, and adds a bounded correction. Its last layer starts at zero, so before training it reproduces the VLA exactly. It is trained with PPO on 40 starting configurations and tested on 10 others.</li>
+        <li><strong>Instruction canonicalisation.</strong> Before the instruction reaches the model, a small sentence encoder maps it to the closest of the 40 LIBERO training instructions; below a similarity threshold fixed in advance, it is left unchanged, so that “sing a song” is not turned into a robot task.</li>
+        <li><strong>Failure search by Quality-Diversity.</strong> MAP-Elites searches combinations of camera, arm, lighting and noise perturbations, each restricted to a range where it alone makes none of the chosen episodes fail. Any failure found is therefore an interaction. The most harmful combinations are re-run on held-out episodes.</li>
+        <li><strong>Residual RL.</strong> A small network sees the arm's state and the action proposed by the frozen VLA, and adds a bounded correction. Its last layer starts at zero, so before training it reproduces the VLA exactly. It is trained with PPO on 40 starting configurations and tested on 10 others, with fixed or randomly redrawn arm offsets.</li>
         <li><strong>Rigour.</strong> Every condition is run on the same episodes (same starting state and random seed), one CSV row per episode, Wilson intervals and paired tests, a cross-check against the official LeRobot evaluation, and determinism checks down to the exact episode length.</li>
       </ul>
       <figure class="shot">
@@ -380,34 +382,44 @@ const PROJECTS = [
       </figure>` },
       { h: "Results", html: `<div class="figs">
           <div class="fig"><b>73% vs 0%</b><span>of episodes reach the goal of the instruction given, against the goal of the scene the robot was placed in: it listens</span></div>
-          <div class="fig"><b>23% vs 80%</b><span>success with hand-written paraphrases against the original wording: it listens to the exact words</span></div>
+          <div class="fig"><b>23% → 80%</b><span>success of paraphrased instructions once mapped back to the closest training instruction, the level of the original wording</span></div>
           <div class="fig"><b>≈ 3°</b><span>of offset per arm joint at the start is enough to halve success, although the objects have not moved</span></div>
-          <div class="fig"><b>14/20 vs 10/20</b><span>for the residual corrector on starts seen in training, but no gain on unseen ones, over three seeds</span></div>
+          <div class="fig"><b>71%</b><span>of held-out episodes fail under combinations of perturbations that, one at a time, make none of them fail</span></div>
         </div>
         <ul>
           <li><strong>The instruction selects the task, like a key.</strong> Told to do another task of the same scene, the robot never completes the scene's own task (0/270) and completes the one it was told in 73% of cases. Rewording the same instruction breaks it, and an empty or unrelated instruction gives 0/50: without a wording it recognises, it does nothing useful.</li>
+          <li><strong>Looking up known wordings repairs it.</strong> Mapping each paraphrase to the closest training instruction brings LIBERO-Goal from 35/150 to 120/150. On LIBERO-Spatial, where instructions only differ by a spatial relation, the encoder confuses “next to” and “on” and success only rises from 26% to 54%.</li>
           <li><strong>It breaks in different ways.</strong> Success declines gradually with the camera angle (halved around 40°), but falls off a cliff for lighting and pixel noise after a long plateau, and has only a narrow tolerance to the arm's starting pose. A single perturbation level per axis would have hidden these differences.</li>
-          <li><strong>The corrector learns, but does not generalise.</strong> It rescues starting configurations it was trained on and makes successful episodes about 20% shorter, but does not help on new configurations. With only proprioception and 40 training starts, it has little to generalise from.</li>
+          <li><strong>Harmless alone, harmful together.</strong> Within ranges where each perturbation alone never breaks the chosen episodes, 98 of 120 combinations break at least one, the four together break all of them, and the most harmful combinations make 47 of 66 held-out episodes fail. As little as 1.8° of camera rotation, 0.02 rad of arm offset and half of the light removed is enough.</li>
+          <li><strong>The corrector learns, but does not generalise.</strong> It rescues starting configurations it was trained on and makes successful episodes about 20% shorter, but does not help on new configurations. Redrawing the arm offsets at every training episode does not change this, so the variety of offsets is not what limits it.</li>
         </ul>
         <figure class="shot wide">
           <a href="assets/vla-robustness/language_matrix.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/language_matrix.png" alt="Two ten-by-ten matrices: on the left, success only on the diagonal; on the right, the instructed goal reached in most cells." loading="lazy"></a>
           <figcaption>Listening test, 300 episodes. Left: the goal of the scene is reached only when the instruction matches it. Right: the goal of the instruction actually given is reached in most cases, whatever the scene.</figcaption>
         </figure>
         <figure class="shot wide">
+          <a href="assets/vla-robustness/language_canonical.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/language_canonical.png" alt="Bar charts of paraphrase success before and after canonicalisation on LIBERO-Goal and LIBERO-Spatial, and a scatter plot of success against embedding similarity." loading="lazy"></a>
+          <figcaption>Paraphrases as written (grey) and after mapping them to the closest training instruction (blue). Right: even paraphrases very close in meaning often fail when given as written.</figcaption>
+        </figure>
+        <figure class="shot wide">
           <a href="assets/vla-robustness/dose_response.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/dose_response.png" alt="Four success-rate curves against perturbation intensity: a gradual decline for the camera, cliffs for the arm pose, lighting and noise." loading="lazy"></a>
           <figcaption>Success against intensity on LIBERO-Spatial, 50 episodes per point, with individual tasks in grey and the breaking point with its bootstrap interval.</figcaption>
         </figure>
         <figure class="shot wide">
-          <a href="assets/vla-robustness/rl_residual.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/rl_residual.png" alt="Left, PPO training curves for three seeds; right, bar chart of success for the VLA alone and with the corrector on seen and unseen starting configurations." loading="lazy"></a>
-          <figcaption>Residual RL over three seeds: better than the VLA alone on starting configurations seen in training, not on held-out ones.</figcaption>
+          <a href="assets/vla-robustness/qd_search.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/qd_search.png" alt="Left, a five-by-five MAP-Elites archive where almost every cell contains a failing combination; right, failure rates of the most harmful combinations on held-out episodes." loading="lazy"></a>
+          <figcaption>Failure search with MAP-Elites. Left: the most harmful combination found in each region of the search space. Right: those combinations on 11 held-out episodes, where each perturbation alone never fails.</figcaption>
+        </figure>
+        <figure class="shot wide">
+          <a href="assets/vla-robustness/rl_residual.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/rl_residual.png" alt="Left, PPO training curves for five runs; right, bar chart of success for the VLA alone and with the corrector on seen and unseen starting configurations." loading="lazy"></a>
+          <figcaption>Residual RL over five runs, three with fixed arm offsets and two with redrawn ones: better than the VLA alone on starting configurations seen in training, not on held-out ones.</figcaption>
         </figure>` },
       { h: "Watch the rollouts", html: `<div class="shots2 rollouts">
           <figure class="shot"><img src="assets/vla-robustness/language-grid.gif" width="876" height="674" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="Six instructions in the same scene" loading="lazy"><figcaption>One scene, six instructions: the robot does what it is told.</figcaption></figure>
           <figure class="shot"><img src="assets/vla-robustness/residual-grid.gif" width="582" height="674" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="VLA alone and with the residual corrector, on a seen and a held-out starting configuration" loading="lazy"><figcaption>VLA alone and with the corrector. Top: a start seen in training, rescued. Bottom: a new start, where it is only faster.</figcaption></figure>
         </div>` },
-      { h: "What is new", html: `<p>LIBERO-Plus and LIBERO-PRO (2025) already perturb LIBERO along many axes, at a few fixed levels, and conclude that VLAs largely ignore language. This project sweeps each perturbation continuously to look at the <em>shape</em> of the degradation, scores every goal of the shared scene instead of only the scene's own goal, which shows that SmolVLA does use the instruction, and tests a residual correction on the weakness that is visible in the robot's own state.</p>` },
-      { h: "My contribution", html: `<p>Solo project, from the question to the report. I ran LIBERO and SmolVLA natively on a MacBook (by skipping a Linux-only dependency), wrote a resumable evaluation loop on top of LeRobot's processors, implemented the perturbations and the goal-level listening test, found and fixed a silent bug where the camera and lighting changes never reached the images, wrote the statistics (Wilson intervals, McNemar tests, logistic and model-free breaking points with a task bootstrap), the residual RL environment and a single-file PPO, and generated every figure, table and number of the report from the per-episode logs.</p>` },
-      { h: "Limits", html: `<p>Simulation only, one model and one checkpoint, 3 to 10 episodes per condition. The measured baselines (59% on LIBERO-Spatial, 84% on LIBERO-Goal) are below the published ones, so conclusions are relative to them. The residual corrector was trained on one task with about 400 episodes per run, so its negative result says more about this budget than about residual RL in general.</p>` }
+      { h: "What is new", html: `<p>LIBERO-Plus and LIBERO-PRO (2025) already perturb LIBERO along many axes, at a few fixed levels, and conclude that VLAs largely ignore language. This project sweeps each perturbation continuously to look at the <em>shape</em> of the degradation, scores every goal of the shared scene instead of only the scene's own goal, which shows that SmolVLA does use the instruction, repairs paraphrases at the input, and uses a Quality-Diversity search, in the spirit of search-based testing of learned systems, to show that perturbations harmless one at a time become harmful together.</p>` },
+      { h: "My contribution", html: `<p>Solo project, from the question to the report. I wrote a resumable evaluation loop on top of LeRobot's processors, implemented the perturbations and the goal-level listening test, found and fixed a silent bug where the camera and lighting changes never reached the images, wrote the statistics (Wilson intervals, McNemar tests, logistic and model-free breaking points with a task bootstrap), the instruction canonicalisation, the MAP-Elites failure search with its held-out validation, the residual RL environment and a single-file PPO, and generated every figure, table and number of the report from the per-episode logs.</p>` },
+      { h: "Limits", html: `<p>Simulation only, one model and one checkpoint, 3 to 10 episodes per condition. The measured baselines (59% on LIBERO-Spatial, 84% on LIBERO-Goal) are below the published ones, so conclusions are relative to them. The residual corrector was trained on one task with about 400 episodes per run, so its negative result says more about this budget than about residual RL in general. Canonicalisation needs the list of known tasks, and the failure search used four episodes for its fitness, which the held-out validation only partly guards against.</p>` }
     ],
     links: [
       { label: "Code", url: "https://github.com/ananalab/vla-stress-test" },
