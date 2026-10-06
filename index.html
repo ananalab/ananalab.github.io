@@ -494,6 +494,111 @@ const PROJECTS = [
     ]
   },
   {
+    id: "sign-recognition",
+    title: "Real-time sign recognition with a CNN, from ASL to French Belgian Sign Language",
+    year: "2026",
+    context: "Independent research project",
+    status: "done",
+    blurb: "Recognition of isolated signs from a webcam, in real time and entirely in the browser, from body, hand and lip landmarks. Evaluation on signers never seen during training, and study of transfer from American Sign Language (ASL) to French Belgian Sign Language (LSFB).",
+    art: "hand",
+    media: { clips: ["clown", "hello", "thankyou", "aussi"].map(c => ({ src: `assets/sign-recognition/${c}.mp4`, poster: `assets/sign-recognition/${c}.jpg` })) },
+    hero: {
+      html: `<div class="vids four">
+        <figure class="vid"><video src="assets/sign-recognition/clown.mp4" poster="assets/sign-recognition/clown.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign clown"></video><figcaption><b>ASL - clown</b><span>99% recognised</span></figcaption></figure>
+        <figure class="vid"><video src="assets/sign-recognition/hello.mp4" poster="assets/sign-recognition/hello.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign hello"></video><figcaption><b>ASL - hello</b><span>56% recognised</span></figcaption></figure>
+        <figure class="vid"><video src="assets/sign-recognition/thankyou.mp4" poster="assets/sign-recognition/thankyou.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign thank you"></video><figcaption><b>ASL - thank you</b><span>56% recognised</span></figcaption></figure>
+        <figure class="vid"><video src="assets/sign-recognition/aussi.mp4" poster="assets/sign-recognition/aussi.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the LSFB sign AUSSI"></video><figcaption><b>LSFB - AUSSI (also)</b><span>90% recognised</span></figcaption></figure>
+      </div>`,
+      caption: "What the model sees: hands, upper body and lips extracted by MediaPipe Holistic. Below each sign, the share of its test clips recognised for signers never seen during training."
+    },
+    tags: ["Computer vision", "Sequence models", "Transfer learning", "Web deployment"],
+    tools: ["Python", "PyTorch", "MediaPipe Holistic", "ONNX", "ONNX Runtime Web", "JavaScript", "Kaggle GPUs", "pytest"],
+    keywords: ["Isolated sign recognition", "Transfer learning", "Signer-independent evaluation", "Pose landmarks", "Conv-Transformer", "MediaPipe Holistic", "Bidirectional GRU", "ONNX Runtime Web", "Data augmentation"],
+    facts: [
+      ["Task", "Isolated sign recognition, closed vocabulary"],
+      ["Input", "MediaPipe Holistic landmarks: 89 points per frame (hands, upper body, lips)"],
+      ["Model", "Convolutional neural network with self-attention (Conv-Transformer, 2.2 M parameters), compared with a bidirectional GRU"],
+      ["Data", "Google ISLR: 250 ASL signs, 94,477 clips, 21 signers<br>LSFB-ISOL: 100 LSFB signs, 55,286 clips, 99 signers"],
+      ["Evaluation", "Signer-independent: 4 ASL and 40 LSFB test signers, three seeds per model"]
+    ],
+    sections: [
+      { h: "Context and objectives", html: `<p>This project addresses <em>isolated</em> sign recognition: identifying a single sign from a closed vocabulary. It is not translation, which would require the grammar, use of space and facial expressions of the language. Models work on landmarks rather than pixels, which keeps them small, fast on CPU and independent of background, and avoids transmitting any video.</p>
+        <p>Three questions guide the study: what accuracy can be expected on people never seen during training, whether a model pre-trained on ASL helps on LSFB, a language with far less labelled data (and distinct from French Sign Language, LSF), and whether recognition can run in real time in a browser without GPU.</p>` },
+      { h: "Method", html: `<ul>
+        <li><strong>Preprocessing.</strong> Landmarks mirrored to a canonical dominant hand, normalised in the body frame and resampled to 64 frames. A single unit-tested function is shared by training and by its JavaScript port in the browser.</li>
+        <li><strong>Training.</strong> Both networks and a statistical baseline trained with three seeds each on Kaggle GPUs, with time-warping and spatial augmentations.</li>
+        <li><strong>Protocol.</strong> Signer-independent splits frozen before any experiment; test sets used once, for the final models.</li>
+      </ul>` },
+      { h: "Key results", html: `<div class="figs">
+          <div class="fig"><b>64.8%</b><span>top-1 on 250 ASL signs and 4 unseen signers (chance: 0.4%, statistical baseline: 42.1%)</span></div>
+          <div class="fig"><b>68.3%</b><span>top-1 on 100 LSFB signs and 40 unseen signers (statistical baseline: 49.0%)</span></div>
+          <div class="fig"><b>+16.9 pts</b><span>overestimation when the same signers appear in training and test (random split)</span></div>
+          <div class="fig"><b>16 ms</b><span>per sign in the browser on one CPU thread, with the same predictions as PyTorch on 40 of 40 clips</span></div>
+        </div>
+        <figure class="shot wide">
+          <a href="assets/sign-recognition/signers_missing.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/signers_missing.png" alt="Two panels: ASL test accuracy per unseen signer, between about 61% and 70%, and accuracy against the share of frames without a detected hand, falling from about 76% to 52% beyond half of the frames." loading="lazy"></a>
+          <figcaption>Accuracy varies from one unseen signer to another (a), and depends above all on whether MediaPipe finds the hands (b): 76% when they are missing in at most 10% of the frames, 52% beyond half, a case that concerns 30% of the ASL test clips.</figcaption>
+        </figure>` },
+      { h: "Which signs are recognised best, and why", html: `<div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>ASL sign</th><th class="num">Recognised</th><th>Most frequent confusion</th></tr></thead>
+          <tbody>
+            <tr class="grp"><td colspan="3">Best-recognised signs</td></tr>
+            <tr><td>clown</td><td class="num">99%</td><td>none above 2%</td></tr>
+            <tr><td>flower</td><td class="num">97%</td><td>none above 2%</td></tr>
+            <tr><td>owl</td><td class="num">96%</td><td>none above 2%</td></tr>
+            <tr class="grp"><td colspan="3">Everyday signs</td></tr>
+            <tr><td>please</td><td class="num">90%</td><td><i>mine/my</i> (4%)</td></tr>
+            <tr><td>hello</td><td class="num">56%</td><td><i>pretend</i> (17%), <i>bedroom</i> (9%)</td></tr>
+            <tr><td>thank you</td><td class="num">56%</td><td><i>bad</i> (10%)</td></tr>
+            <tr><td>mom</td><td class="num">52%</td><td><i>farm</i> (14%)</td></tr>
+          </tbody>
+          <caption>Share of each sign's test clips recognised by the Conv-Transformer (mean over three seeds). Median over the 250 signs: 67%.</caption>
+        </table></div>
+        <p>All signs have a similar number of training clips, so what matters is how distinct a sign is from the others, not how common it is.</p>
+        <ul>
+          <li><strong>The best signs are produced on the face.</strong> <i>Clown</i>, <i>flower</i> and <i>owl</i> are articulated at the nose or the eyes, each with a handshape that no other sign uses there.</li>
+          <li><strong>Basic signs have close neighbours.</strong> <i>Hello</i>, <i>thank you</i> and <i>mom</i> use the most common handshapes (flat or spread hand) at the forehead or chin, where many signs are made. <i>Thank you</i> and <i>bad</i> differ mainly in the final palm orientation, poorly captured in 2D; <i>mom</i> and <i>farm</i> differ only by a tap versus a sweep across the chin. Everyday signs with a distinctive movement, such as <i>please</i>, remain easy.</li>
+        </ul>` },
+      { h: "No transfer from ASL to LSFB", html: `<p>Contrary to the initial hypothesis, initialising the LSFB model from ASL never helps, from 5 examples per sign to the full corpus (left), and with all the data it is even slightly but significantly harmful (66.2% against 68.3% from scratch, on 40 unseen signers). A likely explanation is that the corpora differ in more than the language: isolated signs filmed on a smartphone for ASL, where the hands often leave the frame (right), against signs cut from studio conversations, twice as short, for LSFB.</p>
+        <div class="shots2">
+        <figure class="shot">
+          <a href="assets/sign-recognition/transfer_curve.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/transfer_curve.png" alt="Line chart of LSFB validation accuracy against training examples per sign, from 5 to all: the from-scratch and ASL-pretrained curves overlap up to 25 examples, then from-scratch stays slightly above." loading="lazy"></a>
+          <figcaption>LSFB validation accuracy against training examples per sign (mean ± s.d. over three seeds).</figcaption>
+        </figure>
+        <figure class="shot">
+          <a href="assets/sign-recognition/missing_parts.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/missing_parts.png" alt="Bar chart of frames with a body part missing: in ASL, left hand 72%, right hand 62%, both hands 34%; in LSFB, 10%, 8% and 2%; upper body and lips almost never missing." loading="lazy"></a>
+          <figcaption>Share of frames in which MediaPipe misses each body part: no hand at all in 34% of ASL frames, against 2% for LSFB.</figcaption>
+        </figure>
+        </div>` },
+      { h: "What matters, and pitfalls uncovered", html: `<figure class="shot medium">
+          <a href="assets/sign-recognition/ablations.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/ablations.png" alt="Horizontal bar chart of the change in ASL validation accuracy for each ablation: removing the canonical dominant hand costs 3.8 points, velocities 1.7, augmentation 1.3, while removing lips or zero-padding instead of resampling slightly helps." loading="lazy"></a>
+          <figcaption>One-factor ablations on ASL (change in validation accuracy, in points). Mirroring every clip to a canonical dominant hand matters most; lips, depth and longer sequences do not help. †: run ended early, effect possibly overestimated.</figcaption>
+        </figure>
+        <figure class="shot wide">
+          <a href="assets/sign-recognition/normalisation.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/normalisation.png" alt="Three scatter plots of ASL and LSFB landmarks: in image coordinates, in the body frame without aspect correction where the LSFB nose lies far above the ASL one, and after correction where both align." loading="lazy"></a>
+          <figcaption>Anamorphic LSFB videos: in the body frame, the LSFB nose lies far above the ASL one (b) until the aspect ratio is corrected (c).</figcaption>
+        </figure>
+        <ul>
+        <li><strong>Quantisation.</strong> Naive INT8 quantisation halves accuracy (68% to 34%) because of rare feature outliers, and even once fixed, the model is slower on CPU; the demo ships FP32.</li>
+        <li><strong>Early stopping.</strong> Stopping on a plateau made one ablation look five times more harmful than it is.</li>
+      </ul>` },
+      { h: "Interactive demo", html: `<figure class="shot wide">
+          <a href="assets/sign-recognition/demo/index.html" target="_blank" rel="noopener" title="Open the demo"><img src="assets/sign-recognition/demo.png" alt="Demo interface: on the left, the replayed skeleton of an LSFB clip; on the right, the prediction EQUIPE at 84%, the top-5 signs, signs to try and the vocabulary." loading="lazy"></a>
+          <figcaption>Signs are segmented automatically from the webcam and classified locally; LSFB test clips can also be replayed without a camera. Click the image to open the demo.</figcaption>
+        </figure>` },
+      { h: "Limitations", html: `<ul>
+        <li>Few signers (21 for ASL): accuracy on a new user can be well below the average.</li>
+        <li>Only the lips are used from the face, whereas eyebrows, gaze and head movements carry part of the grammar.</li>
+        <li>Not evaluated with Deaf signers; such technologies should be built with and for Deaf communities.</li>
+      </ul>` }
+    ],
+    links: [
+      { label: "Live demo", url: "assets/sign-recognition/demo/index.html" },
+      { label: "Paper (PDF)", url: "assets/sign-recognition/paper.pdf" },
+      { label: "Code", url: "https://github.com/ananalab/Real-time-sign-recognition-with-a-Conv-Transformer-on-MediaPipe-landmarks" }
+    ]
+  },
+  {
     id: "birdclef",
     title: "Species sound classification with classical ML",
     year: "2026",
@@ -598,111 +703,6 @@ const PROJECTS = [
       { h: "Confidentiality", html: `<p>The detailed methods and results, as well as the report and source code, are currently confidential, as this work is being prepared for submission to a medical journal.</p>` }
     ],
     links: []
-  },
-  {
-    id: "sign-recognition",
-    title: "Real-time sign recognition with a CNN, from ASL to French Belgian Sign Language",
-    year: "2026",
-    context: "Independent research project",
-    status: "done",
-    blurb: "Recognition of isolated signs from a webcam, in real time and entirely in the browser, from body, hand and lip landmarks. Evaluation on signers never seen during training, and study of transfer from American Sign Language (ASL) to French Belgian Sign Language (LSFB).",
-    art: "hand",
-    media: { clips: ["clown", "hello", "thankyou", "aussi"].map(c => ({ src: `assets/sign-recognition/${c}.mp4`, poster: `assets/sign-recognition/${c}.jpg` })) },
-    hero: {
-      html: `<div class="vids four">
-        <figure class="vid"><video src="assets/sign-recognition/clown.mp4" poster="assets/sign-recognition/clown.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign clown"></video><figcaption><b>ASL - clown</b><span>99% recognised</span></figcaption></figure>
-        <figure class="vid"><video src="assets/sign-recognition/hello.mp4" poster="assets/sign-recognition/hello.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign hello"></video><figcaption><b>ASL - hello</b><span>56% recognised</span></figcaption></figure>
-        <figure class="vid"><video src="assets/sign-recognition/thankyou.mp4" poster="assets/sign-recognition/thankyou.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign thank you"></video><figcaption><b>ASL - thank you</b><span>56% recognised</span></figcaption></figure>
-        <figure class="vid"><video src="assets/sign-recognition/aussi.mp4" poster="assets/sign-recognition/aussi.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the LSFB sign AUSSI"></video><figcaption><b>LSFB - AUSSI (also)</b><span>90% recognised</span></figcaption></figure>
-      </div>`,
-      caption: "What the model sees: hands, upper body and lips extracted by MediaPipe Holistic. Below each sign, the share of its test clips recognised for signers never seen during training."
-    },
-    tags: ["Computer vision", "Sequence models", "Transfer learning", "Web deployment"],
-    tools: ["Python", "PyTorch", "MediaPipe Holistic", "ONNX", "ONNX Runtime Web", "JavaScript", "Kaggle GPUs", "pytest"],
-    keywords: ["Isolated sign recognition", "Transfer learning", "Signer-independent evaluation", "Pose landmarks", "Conv-Transformer", "MediaPipe Holistic", "Bidirectional GRU", "ONNX Runtime Web", "Data augmentation"],
-    facts: [
-      ["Task", "Isolated sign recognition, closed vocabulary"],
-      ["Input", "MediaPipe Holistic landmarks: 89 points per frame (hands, upper body, lips)"],
-      ["Model", "Convolutional neural network with self-attention (Conv-Transformer, 2.2 M parameters), compared with a bidirectional GRU"],
-      ["Data", "Google ISLR: 250 ASL signs, 94,477 clips, 21 signers<br>LSFB-ISOL: 100 LSFB signs, 55,286 clips, 99 signers"],
-      ["Evaluation", "Signer-independent: 4 ASL and 40 LSFB test signers, three seeds per model"]
-    ],
-    sections: [
-      { h: "Context and objectives", html: `<p>This project addresses <em>isolated</em> sign recognition: identifying a single sign from a closed vocabulary. It is not translation, which would require the grammar, use of space and facial expressions of the language. Models work on landmarks rather than pixels, which keeps them small, fast on CPU and independent of background, and avoids transmitting any video.</p>
-        <p>Three questions guide the study: what accuracy can be expected on people never seen during training, whether a model pre-trained on ASL helps on LSFB, a language with far less labelled data (and distinct from French Sign Language, LSF), and whether recognition can run in real time in a browser without GPU.</p>` },
-      { h: "Method", html: `<ul>
-        <li><strong>Preprocessing.</strong> Landmarks mirrored to a canonical dominant hand, normalised in the body frame and resampled to 64 frames. A single unit-tested function is shared by training and by its JavaScript port in the browser.</li>
-        <li><strong>Training.</strong> Both networks and a statistical baseline trained with three seeds each on Kaggle GPUs, with time-warping and spatial augmentations.</li>
-        <li><strong>Protocol.</strong> Signer-independent splits frozen before any experiment; test sets used once, for the final models.</li>
-      </ul>` },
-      { h: "Key results", html: `<div class="figs">
-          <div class="fig"><b>64.8%</b><span>top-1 on 250 ASL signs and 4 unseen signers (chance: 0.4%, statistical baseline: 42.1%)</span></div>
-          <div class="fig"><b>68.3%</b><span>top-1 on 100 LSFB signs and 40 unseen signers (statistical baseline: 49.0%)</span></div>
-          <div class="fig"><b>+16.9 pts</b><span>overestimation when the same signers appear in training and test (random split)</span></div>
-          <div class="fig"><b>16 ms</b><span>per sign in the browser on one CPU thread, with the same predictions as PyTorch on 40 of 40 clips</span></div>
-        </div>
-        <figure class="shot wide">
-          <a href="assets/sign-recognition/signers_missing.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/signers_missing.png" alt="Two panels: ASL test accuracy per unseen signer, between about 61% and 70%, and accuracy against the share of frames without a detected hand, falling from about 76% to 52% beyond half of the frames." loading="lazy"></a>
-          <figcaption>Accuracy varies from one unseen signer to another (a), and depends above all on whether MediaPipe finds the hands (b): 76% when they are missing in at most 10% of the frames, 52% beyond half, a case that concerns 30% of the ASL test clips.</figcaption>
-        </figure>` },
-      { h: "Which signs are recognised best, and why", html: `<div class="tbl-wrap"><table class="tbl">
-          <thead><tr><th>ASL sign</th><th class="num">Recognised</th><th>Most frequent confusion</th></tr></thead>
-          <tbody>
-            <tr class="grp"><td colspan="3">Best-recognised signs</td></tr>
-            <tr><td>clown</td><td class="num">99%</td><td>none above 2%</td></tr>
-            <tr><td>flower</td><td class="num">97%</td><td>none above 2%</td></tr>
-            <tr><td>owl</td><td class="num">96%</td><td>none above 2%</td></tr>
-            <tr class="grp"><td colspan="3">Everyday signs</td></tr>
-            <tr><td>please</td><td class="num">90%</td><td><i>mine/my</i> (4%)</td></tr>
-            <tr><td>hello</td><td class="num">56%</td><td><i>pretend</i> (17%), <i>bedroom</i> (9%)</td></tr>
-            <tr><td>thank you</td><td class="num">56%</td><td><i>bad</i> (10%)</td></tr>
-            <tr><td>mom</td><td class="num">52%</td><td><i>farm</i> (14%)</td></tr>
-          </tbody>
-          <caption>Share of each sign's test clips recognised by the Conv-Transformer (mean over three seeds). Median over the 250 signs: 67%.</caption>
-        </table></div>
-        <p>All signs have a similar number of training clips, so what matters is how distinct a sign is from the others, not how common it is.</p>
-        <ul>
-          <li><strong>The best signs are produced on the face.</strong> <i>Clown</i>, <i>flower</i> and <i>owl</i> are articulated at the nose or the eyes, each with a handshape that no other sign uses there.</li>
-          <li><strong>Basic signs have close neighbours.</strong> <i>Hello</i>, <i>thank you</i> and <i>mom</i> use the most common handshapes (flat or spread hand) at the forehead or chin, where many signs are made. <i>Thank you</i> and <i>bad</i> differ mainly in the final palm orientation, poorly captured in 2D; <i>mom</i> and <i>farm</i> differ only by a tap versus a sweep across the chin. Everyday signs with a distinctive movement, such as <i>please</i>, remain easy.</li>
-        </ul>` },
-      { h: "No transfer from ASL to LSFB", html: `<p>Contrary to the initial hypothesis, initialising the LSFB model from ASL never helps, from 5 examples per sign to the full corpus (left), and with all the data it is even slightly but significantly harmful (66.2% against 68.3% from scratch, on 40 unseen signers). A likely explanation is that the corpora differ in more than the language: isolated signs filmed on a smartphone for ASL, where the hands often leave the frame (right), against signs cut from studio conversations, twice as short, for LSFB.</p>
-        <div class="shots2">
-        <figure class="shot">
-          <a href="assets/sign-recognition/transfer_curve.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/transfer_curve.png" alt="Line chart of LSFB validation accuracy against training examples per sign, from 5 to all: the from-scratch and ASL-pretrained curves overlap up to 25 examples, then from-scratch stays slightly above." loading="lazy"></a>
-          <figcaption>LSFB validation accuracy against training examples per sign (mean ± s.d. over three seeds).</figcaption>
-        </figure>
-        <figure class="shot">
-          <a href="assets/sign-recognition/missing_parts.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/missing_parts.png" alt="Bar chart of frames with a body part missing: in ASL, left hand 72%, right hand 62%, both hands 34%; in LSFB, 10%, 8% and 2%; upper body and lips almost never missing." loading="lazy"></a>
-          <figcaption>Share of frames in which MediaPipe misses each body part: no hand at all in 34% of ASL frames, against 2% for LSFB.</figcaption>
-        </figure>
-        </div>` },
-      { h: "What matters, and pitfalls uncovered", html: `<figure class="shot medium">
-          <a href="assets/sign-recognition/ablations.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/ablations.png" alt="Horizontal bar chart of the change in ASL validation accuracy for each ablation: removing the canonical dominant hand costs 3.8 points, velocities 1.7, augmentation 1.3, while removing lips or zero-padding instead of resampling slightly helps." loading="lazy"></a>
-          <figcaption>One-factor ablations on ASL (change in validation accuracy, in points). Mirroring every clip to a canonical dominant hand matters most; lips, depth and longer sequences do not help. †: run ended early, effect possibly overestimated.</figcaption>
-        </figure>
-        <figure class="shot wide">
-          <a href="assets/sign-recognition/normalisation.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/normalisation.png" alt="Three scatter plots of ASL and LSFB landmarks: in image coordinates, in the body frame without aspect correction where the LSFB nose lies far above the ASL one, and after correction where both align." loading="lazy"></a>
-          <figcaption>Anamorphic LSFB videos: in the body frame, the LSFB nose lies far above the ASL one (b) until the aspect ratio is corrected (c).</figcaption>
-        </figure>
-        <ul>
-        <li><strong>Quantisation.</strong> Naive INT8 quantisation halves accuracy (68% to 34%) because of rare feature outliers, and even once fixed, the model is slower on CPU; the demo ships FP32.</li>
-        <li><strong>Early stopping.</strong> Stopping on a plateau made one ablation look five times more harmful than it is.</li>
-      </ul>` },
-      { h: "Interactive demo", html: `<figure class="shot wide">
-          <a href="assets/sign-recognition/demo/index.html" target="_blank" rel="noopener" title="Open the demo"><img src="assets/sign-recognition/demo.png" alt="Demo interface: on the left, the replayed skeleton of an LSFB clip; on the right, the prediction EQUIPE at 84%, the top-5 signs, signs to try and the vocabulary." loading="lazy"></a>
-          <figcaption>Signs are segmented automatically from the webcam and classified locally; LSFB test clips can also be replayed without a camera. Click the image to open the demo.</figcaption>
-        </figure>` },
-      { h: "Limitations", html: `<ul>
-        <li>Few signers (21 for ASL): accuracy on a new user can be well below the average.</li>
-        <li>Only the lips are used from the face, whereas eyebrows, gaze and head movements carry part of the grammar.</li>
-        <li>Not evaluated with Deaf signers; such technologies should be built with and for Deaf communities.</li>
-      </ul>` }
-    ],
-    links: [
-      { label: "Live demo", url: "assets/sign-recognition/demo/index.html" },
-      { label: "Paper (PDF)", url: "assets/sign-recognition/paper.pdf" },
-      { label: "Code", url: "https://github.com/ananalab/Real-time-sign-recognition-with-a-Conv-Transformer-on-MediaPipe-landmarks" }
-    ]
   },
   {
     id: "llm-reward",
