@@ -706,16 +706,16 @@ const PROJECTS = [
   },
   {
     id: "llm-reward",
-    title: "Can an LLM write a robot's reward?",
+    title: "Can a vision-language model write a robot's reward?",
     year: "2026",
     context: "Independent research project",
     status: "ongoing",
-    blurb: "A language model writes the reward functions used to train a simulated robot with reinforcement learning, and improves them from feedback. Does seeing images of the robot help it correct its mistakes?",
+    blurb: "A vision-language model writes the reward functions used to train a simulated robot with reinforcement learning, and improves them from feedback. Does seeing images of the robot help it correct its mistakes?",
     art: "loop",
     media: { caption: "Schematic illustration of the concept. The project is in progress." },
-    tags: ["LLMs", "Reinforcement learning", "Reward design"],
-    tools: ["Python", "JAX", "MuJoCo Playground", "Brax PPO", "LLM APIs"],
-    keywords: ["Reward design", "Reward hacking", "LLM", "Eureka", "PPO", "Visual feedback", "MuJoCo Playground"],
+    tags: ["Vision-language models", "Reinforcement learning", "Reward design"],
+    tools: ["Python", "JAX", "MuJoCo Playground", "Brax PPO", "Gemma 4 (Ollama)"],
+    keywords: ["Reward design", "Reward hacking", "Vision-language model", "Eureka", "PPO", "Visual feedback", "MuJoCo Playground"],
     facts: [
       ["Status", "In progress"],
       ["Format", "Solo project"],
@@ -723,7 +723,7 @@ const PROJECTS = [
     ],
     sections: [
       { h: "Concept", html: `<p>In reinforcement learning, a robot learns from a reward function that scores its behaviour. Writing this function by hand is difficult: a poorly specified reward is often exploited by the robot in unintended ways, a phenomenon known as <em>reward hacking</em>.</p>
-        <p>Following Eureka (Ma et al., 2023), a language model writes the reward, a policy is trained with it, and the model revises the reward from the outcome. The project tests whether giving the model images of the robot's behaviour, in addition to training statistics, helps it detect and correct such failures.</p>` },
+        <p>Following Eureka (Ma et al., 2023), a vision-language model (Gemma 4, 31B) writes the reward, a policy is trained with it, and the model revises the reward from the outcome. The project tests whether giving the model images of the robot's behaviour, in addition to training statistics, helps it detect and correct such failures.</p>` },
       { h: "Status", html: `<p>In progress.</p>` }
     ],
     links: [
@@ -1109,7 +1109,7 @@ const CHEETAH_FLIP = { torso: [[-0.65, 0.16], [0.6, 0.16]], neck: [[0.6, 0.16], 
   legs: [[[-0.65, 0.16], [-0.95, 0.48], [-0.7, 0.8], [-0.85, 0.98]], [[0.6, 0.16], [0.85, 0.5], [0.62, 0.82], [0.78, 1.0]]] };
 function artLoop(ctx, w, h, T) {
   ctx.fillStyle = T.sunk; ctx.fillRect(0, 0, w, h);
-  cardHead(ctx, T, "LLM-written reward · half-cheetah", "does seeing the robot help?");
+  cardHead(ctx, T, "VLM-written reward · half-cheetah", "does seeing the robot help?");
   const W = Math.min(w, h * 1.9), X = (w - W) / 2, top = 52, bot = h - 14;
   // code sheet
   const code = ["def reward(s, a):", "  v = s.forward_vel", "  e = (a ** 2).sum()", "  up = s.torso_up", "  return v - 0.1 * e"];
