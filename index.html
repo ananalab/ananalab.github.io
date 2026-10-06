@@ -279,7 +279,7 @@ const PROJECTS = [
     facts: [
       ["Model", "SmolVLA, 450M parameters (checkpoint lerobot/smolvla_libero)"],
       ["Benchmark", "LIBERO, simulated Franka arm in MuJoCo"],
-      ["Scale", "3,688 simulated episodes"]
+      ["Scale", "3,688 episodes, about 40 hours of compute"]
     ],
     sections: [
       { h: "Question", html: `<p>Vision-language-action (VLA) models receive a camera image and an instruction such as “put the bowl on the plate”, and directly output the motions of a robot arm. On simulation benchmarks they now succeed most of the time, which says little about two things that matter once the robot leaves the benchmark: is the instruction actually used, and what happens when the scene is slightly different from the demonstrations?</p>
