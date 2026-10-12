@@ -340,7 +340,7 @@ const PROJECTS = [
       { h: "Limits", html: `<p>Simulation only, one model and one checkpoint, 3 to 10 episodes per condition. The measured baselines (59% on LIBERO-Spatial, 84% on LIBERO-Goal) are below the published ones, so conclusions are relative to them. The residual corrector was trained on one task with about 400 episodes per run, so its negative result says more about this budget than about residual RL in general. Canonicalisation needs the list of known tasks, and the failure search used four episodes for its fitness, which the held-out validation only partly guards against; episode outcomes are not monotonic in the intensity, so interactions are only counted against single-component controls.</p>` }
     ],
     links: [
-      { label: "Code", url: "https://github.com/ananalab/vla-stress-test" },
+      { label: "GitHub", url: "https://github.com/ananalab/vla-stress-test" },
       { label: "Report (PDF)", url: "assets/vla-robustness/report.pdf" }
     ]
   },
@@ -407,7 +407,7 @@ const PROJECTS = [
       { h: "Limits", html: `<p>Simulation only, one robot, damages modelled as weakened motors, one repertoire size and three seeds per algorithm. The robust policy is tested on the family of damages it was trained on, so the case for repertoires and ITE remains the unexpected damage on a real robot, which is the natural next step.</p>` }
     ],
     links: [
-      { label: "Code", url: "https://github.com/ananalab/qd-damage-recovery" },
+      { label: "GitHub", url: "https://github.com/ananalab/qd-damage-recovery" },
       { label: "Report (PDF)", url: "assets/qd-damage/report.pdf" }
     ]
   },
@@ -491,7 +491,7 @@ const PROJECTS = [
       </ul>` }
     ],
     links: [
-      { label: "Code", url: "https://github.com/ananalab/Real-to-Sim" },
+      { label: "GitHub", url: "https://github.com/ananalab/Real-to-Sim" },
       { label: "Report (PDF, French)", url: "assets/real-to-sim-report.pdf" }
     ]
   },
@@ -597,7 +597,7 @@ const PROJECTS = [
     links: [
       { label: "Live demo", url: "assets/sign-recognition/demo/index.html" },
       { label: "Paper (PDF)", url: "assets/sign-recognition/paper.pdf" },
-      { label: "Code", url: "https://github.com/ananalab/Real-time-sign-recognition-with-a-Conv-Transformer-on-MediaPipe-landmarks" }
+      { label: "GitHub", url: "https://github.com/ananalab/Real-time-sign-recognition-with-a-Conv-Transformer-on-MediaPipe-landmarks" }
     ]
   },
   {
@@ -667,7 +667,7 @@ const PROJECTS = [
       { h: "My contribution", html: `<p>Individual project, from the data analysis to the final report. I designed the feature set and the validation protocol, tuned LightGBM by Bayesian search, and ran the pseudo-labeling, noise-augmentation and per-species error analyses.</p>` }
     ],
     links: [
-      { label: "Code", url: "https://github.com/ananalab/birdclef-2026" },
+      { label: "GitHub", url: "https://github.com/ananalab/birdclef-2026" },
       { label: "Kaggle", url: "https://www.kaggle.com/competitions/birdclef-2026" },
       { label: "Report (PDF, French)", url: "assets/birdclef-report.pdf" }
     ]
@@ -729,7 +729,7 @@ const PROJECTS = [
       { h: "Status", html: `<p>In progress.</p>` }
     ],
     links: [
-      { label: "Code", url: "https://github.com/ananalab/llm-reward-lab" }
+      { label: "GitHub", url: "https://github.com/ananalab/llm-reward-lab" }
     ]
   },
   {
@@ -829,7 +829,7 @@ const LINK_ICONS = {
   ext: '<path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/>'
 };
 const linkIcon = label => {
-  const k = /code/i.test(label) ? "code" : /pdf|report|paper/i.test(label) ? "doc" : /demo/i.test(label) ? "demo" : "ext";
+  const k = /code|github/i.test(label) ? "code" : /pdf|report|paper/i.test(label) ? "doc" : /demo/i.test(label) ? "demo" : "ext";
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${LINK_ICONS[k]}</svg>`;
 };
 
