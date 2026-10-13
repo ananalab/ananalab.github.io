@@ -142,7 +142,7 @@ strong{font-weight:600}
 img.scene-in{width:28%;height:auto;aspect-ratio:4/3;object-fit:cover;border:2px solid #fff}
 p.scene-in{max-width:42%;margin:0;padding:6px 9px;background:rgba(255,255,255,.88);color:#1d2421;font-size:12px;line-height:1.35}
 @media (max-width:680px){.scenes{grid-template-columns:minmax(0,1fr)}}
-.shot{margin:4px 0 0;display:grid;gap:8px;max-width:66ch}
+.shot{margin:4px 0 0;display:grid;gap:8px}
 .shot a{display:block;cursor:zoom-in}
 .shot img{display:block;width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:12px}
 .shot.narrow{max-width:400px}
@@ -154,7 +154,7 @@ p.scene-in{max-width:42%;margin:0;padding:6px 9px;background:rgba(255,255,255,.8
 .vid figcaption{display:grid;gap:1px;font-family:var(--mono);font-size:12px;line-height:1.4}
 .vid figcaption b{font-weight:500;color:var(--ink)}
 .vid figcaption span{color:var(--muted)}
-.sim-view{position:relative;aspect-ratio:16/10;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface);max-width:66ch}
+.sim-view{position:relative;aspect-ratio:16/10;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
 .sim-view iframe{display:block;width:100%;height:100%;border:0;color-scheme:normal}
 .vids.four{grid-template-columns:repeat(4,minmax(0,1fr))}
 .vids.four video{aspect-ratio:1/1}
@@ -164,7 +164,7 @@ p.scene-in{max-width:42%;margin:0;padding:6px 9px;background:rgba(255,255,255,.8
 @media (max-width:680px){.shots2{grid-template-columns:minmax(0,1fr)}}
 /* Two GIFs of different aspect ratios: columns proportional to their widths so both share one height */
 @media (min-width:681px){.shots2.rollouts{grid-template-columns:minmax(0,876fr) minmax(0,582fr)}}
-.tbl-wrap{max-width:66ch;overflow-x:auto}
+.tbl-wrap{overflow-x:auto}
 .tbl{width:100%;border-collapse:collapse;font-size:15px;line-height:1.4}
 .tbl th{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:0 12px 8px 0;border-bottom:1px solid var(--line)}
 .tbl td{padding:7px 12px 7px 0;border-bottom:1px solid var(--line);vertical-align:top}
@@ -192,7 +192,6 @@ p.scene-in{max-width:42%;margin:0;padding:6px 9px;background:rgba(255,255,255,.8
 .d-links{display:flex;flex-wrap:wrap;gap:8px}
 .d-main section{display:grid;gap:12px}
 .d-main h2{font-size:1.25rem;font-weight:650;font-stretch:90%}
-.d-main p,.d-main li{max-width:66ch}
 .d-main ul{margin:0;padding-left:1.1em;display:grid;gap:8px}
 .d-main li::marker{color:var(--accent)}
 .figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
