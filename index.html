@@ -10,8 +10,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible+Next:ital,wght@0,400..600;1,400&display=swap">
 <style>
-/* Layout: intro (availability and section links, name, one-line pitch, links), About me (text and a background
-   timeline), publications, then the project archive: a two-column grid of cards. Each card opens its own page at #project-id. */
+/* Layout: a top bar (availability, section and contact links), the intro (name, pitch, interests) with the
+   publications on its right, the project archive (a two-column grid of cards), then About me (text and a
+   background timeline). Each card opens its own page at #project-id. */
 :root{
   --bg:#EEF2F0;
   --surface:#FAFCFB;
@@ -52,16 +53,21 @@ p{margin:0}
 strong{font-weight:600}
 
 /* Intro */
-.intro{display:grid;gap:22px;min-width:0}
-.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;margin-bottom:10px}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;margin-bottom:28px}
+.intro{display:grid;gap:40px}
+.intro-main{display:grid;gap:18px;min-width:0}
+@media (min-width:980px){.intro{grid-template-columns:minmax(0,1fr) 320px;gap:56px;align-items:start}}
+.pubs{display:grid;gap:12px;align-self:center}
+.pubs h2{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0}
+.pubs h2 span{color:var(--accent);margin-left:6px}
 .top nav{display:flex;flex-wrap:wrap;gap:6px 20px;font-family:var(--mono);font-size:12.5px}
 .top nav a{color:var(--muted);text-decoration:none;transition:color .15s}
 .top nav a:hover{color:var(--accent)}
 .photo{flex:none;width:clamp(76px,11vw,116px);aspect-ratio:1;border-radius:50%;overflow:hidden;background:var(--sunk)}
 .photo img{width:100%;height:100%;object-fit:cover;display:block}
-.pub{display:grid;gap:8px;align-content:start;padding:18px 20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s}
+.pub{display:grid;gap:6px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s}
 .pub:hover{border-color:var(--accent)}
-.pub-title{font-family:var(--display);font-size:1.12rem;font-weight:600;font-stretch:92%;line-height:1.3}
+.pub-title{font-size:15px;line-height:1.35;font-weight:500}
 .pub-authors{font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.45}
 .pub-authors b{color:var(--ink);font-weight:500}
 .avail{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--muted);letter-spacing:.02em}
@@ -71,16 +77,12 @@ strong{font-weight:600}
 .id > div{min-width:0}
 .name{font-size:clamp(2.3rem,6.5vw,3.9rem);font-weight:720;font-stretch:82%;letter-spacing:-.025em;line-height:.95}
 .role{font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:10px;letter-spacing:.01em}
-.pitch{font-size:clamp(1.1rem,2vw,1.3rem);line-height:1.5;max-width:58ch}
-.links{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
-.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:13px;font-weight:500;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s,background-color .15s}
-.btn:hover{border-color:var(--accent)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-.btn.primary:hover{border-color:var(--ink)}
+.pitch{font-size:clamp(1.05rem,1.8vw,1.2rem);line-height:1.55;max-width:77ch}
+.interests{display:flex;flex-wrap:wrap;gap:4px 14px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.interests b{font-weight:500;color:var(--ink)}
 
 /* Home sections */
 .sect{margin-top:clamp(44px,7vw,76px);scroll-margin-top:24px}
-.sec-head h2 span{font-family:var(--mono);font-size:11.5px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-left:10px}
 
 /* About me: text on the left, background timeline on the right */
 .about-grid{display:grid;gap:36px}
@@ -103,10 +105,6 @@ strong{font-weight:600}
 .tl-what a:hover{color:var(--accent)}
 .tl-what a span{color:var(--accent)}
 .tl-where{font-size:14.5px;line-height:1.45;color:var(--muted)}
-
-/* Publications */
-.pub-grid{display:grid;gap:16px}
-@media (min-width:760px){.pub-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* Project grid */
 .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:22px}
@@ -246,13 +244,12 @@ img{max-width:100%}
 
 <div class="wrap">
   <main id="home">
-    <header class="intro" id="intro"></header>
-    <section class="sect" id="about" aria-labelledby="about-title"></section>
-    <section class="sect" id="publications" aria-labelledby="pubs-title"></section>
+    <header id="intro"></header>
     <section class="sect projects" id="projects" aria-labelledby="projects-title">
       <div class="sec-head"><h2 id="projects-title">Projects</h2><span id="count"></span></div>
       <div class="grid" id="grid"></div>
     </section>
+    <section class="sect" id="about" aria-labelledby="about-title"></section>
   </main>
   <main id="detail" hidden></main>
   <footer id="foot"></footer>
@@ -873,9 +870,9 @@ const PROJECTS = [
 const $ = s => document.querySelector(s);
 const displayName = () => PROFILE.name;
 
-function linkBtn(l, primary) {
+function topLink(l) {
   const external = /^https?:/.test(l.url) || /\.(pdf|html)$/i.test(l.url);
-  return `<a class="btn${primary ? " primary" : ""}" href="${l.url}"${external ? ` target="_blank" rel="noopener"` : ""}>${l.label}</a>`;
+  return `<a href="${l.url}"${external ? ` target="_blank" rel="noopener"` : ""}>${l.label}</a>`;
 }
 
 function thumbHTML(p) {
@@ -905,22 +902,27 @@ function renderHome() {
   $("#intro").innerHTML = `
     <div class="top">
       <p class="avail"><span class="dot" aria-hidden="true"></span>${P.available}</p>
-      <nav aria-label="Sections"><a href="#about">About</a><a href="#publications">Publications</a><a href="#projects">Projects</a></nav>
+      <nav aria-label="Sections and links"><a href="#projects">Projects</a>${P.links.map(topLink).join("")}<a href="#about">About me</a></nav>
     </div>
-    <div class="id">
-      <div class="photo"><img src="${P.photo}" alt="Portrait of ${displayName()}"></div>
-      <div><h1 class="name">${name}</h1><p class="role">${P.role}</p></div>
-    </div>
-    <p class="pitch">${P.pitch}</p>
-    <nav class="links" aria-label="Links">${P.links.map((l, i) => linkBtn(l, i === 0)).join("")}</nav>`;
+    <div class="intro">
+      <div class="intro-main">
+        <div class="id">
+          <div class="photo"><img src="${P.photo}" alt="Portrait of ${displayName()}"></div>
+          <div><h1 class="name">${name}</h1><p class="role">${P.role}</p></div>
+        </div>
+        <p class="pitch">${P.pitch}</p>
+        <p class="interests"><b>Interests</b>${P.interests.map(i => `<span>${i}</span>`).join("")}</p>
+      </div>
+      <aside class="pubs">
+        <h2>Publications <span>in preparation</span></h2>${P.publications.map(q => `<a class="pub" href="#${q.project}"><span class="pub-title">${q.title}</span><span class="pub-authors">${q.authors.replace("A. Azouaoui", "<b>A. Azouaoui</b>")}</span></a>`).join("")}
+      </aside>
+    </div>`;
 
   $("#about").innerHTML = `
     <div class="sec-head"><h2 id="about-title">About me</h2></div>
     <div class="about-grid">
       <div class="about-text">
         ${P.about.map(t => `<p>${t}</p>`).join("")}
-        <h3 class="mini">Interests</h3>
-        <ul class="tags">${P.interests.map(i => `<li>${i}</li>`).join("")}</ul>
         <h3 class="mini">Languages</h3>
         <p class="langs">${P.languages}</p>
       </div>
@@ -935,10 +937,6 @@ function renderHome() {
         </ol>
       </div>
     </div>`;
-
-  $("#publications").innerHTML = `
-    <div class="sec-head"><h2 id="pubs-title">Publications<span>in preparation</span></h2><span>${P.publications.length} manuscripts</span></div>
-    <div class="pub-grid">${P.publications.map(q => `<a class="pub" href="#${q.project}"><span class="pub-title">${q.title}</span><span class="pub-authors">${q.authors.replace("A. Azouaoui", "<b>A. Azouaoui</b>")}</span></a>`).join("")}</div>`;
 
   $("#count").textContent = `${PROJECTS.length} project${PROJECTS.length > 1 ? "s" : ""}`;
   $("#grid").innerHTML = PROJECTS.map(p => `
