@@ -10,8 +10,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible+Next:ital,wght@0,400..600;1,400&display=swap">
 <style>
-/* Layout: a short left-aligned intro (availability, name, one-paragraph bio, links), then the project archive:
-   a two-column grid of cards. Each card opens its own page at #project-id. */
+/* Layout: intro (availability and section links, name, one-line pitch, links), About me (text and a background
+   timeline), publications, then the project archive: a two-column grid of cards. Each card opens its own page at #project-id. */
 :root{
   --bg:#EEF2F0;
   --surface:#FAFCFB;
@@ -52,17 +52,16 @@ p{margin:0}
 strong{font-weight:600}
 
 /* Intro */
-.intro{display:grid;gap:40px}
-.intro-main{display:grid;gap:18px;min-width:0}
-@media (min-width:980px){.intro{grid-template-columns:minmax(0,1fr) 320px;gap:56px;align-items:start}}
-.pubs{display:grid;gap:12px;align-self:center}
+.intro{display:grid;gap:22px;min-width:0}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;margin-bottom:10px}
+.top nav{display:flex;flex-wrap:wrap;gap:6px 20px;font-family:var(--mono);font-size:12.5px}
+.top nav a{color:var(--muted);text-decoration:none;transition:color .15s}
+.top nav a:hover{color:var(--accent)}
 .photo{flex:none;width:clamp(76px,11vw,116px);aspect-ratio:1;border-radius:50%;overflow:hidden;background:var(--sunk)}
 .photo img{width:100%;height:100%;object-fit:cover;display:block}
-.pubs h2{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0}
-.pubs h2 span{color:var(--accent);margin-left:6px}
-.pub{display:grid;gap:6px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s}
+.pub{display:grid;gap:8px;align-content:start;padding:18px 20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s}
 .pub:hover{border-color:var(--accent)}
-.pub-title{font-size:15px;line-height:1.35;font-weight:500}
+.pub-title{font-family:var(--display);font-size:1.12rem;font-weight:600;font-stretch:92%;line-height:1.3}
 .pub-authors{font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.45}
 .pub-authors b{color:var(--ink);font-weight:500}
 .avail{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--muted);letter-spacing:.02em}
@@ -72,16 +71,44 @@ strong{font-weight:600}
 .id > div{min-width:0}
 .name{font-size:clamp(2.3rem,6.5vw,3.9rem);font-weight:720;font-stretch:82%;letter-spacing:-.025em;line-height:.95}
 .role{font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:10px;letter-spacing:.01em}
-.bio{font-size:clamp(1.05rem,1.8vw,1.2rem);line-height:1.55;max-width:77ch}
-.interests{display:flex;flex-wrap:wrap;gap:4px 14px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
-.interests b{font-weight:500;color:var(--ink)}
+.pitch{font-size:clamp(1.1rem,2vw,1.3rem);line-height:1.5;max-width:58ch}
 .links{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
 .btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:13px;font-weight:500;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s,background-color .15s}
 .btn:hover{border-color:var(--accent)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{border-color:var(--ink)}
+
+/* Home sections */
+.sect{margin-top:clamp(44px,7vw,76px);scroll-margin-top:24px}
+.sec-head h2 span{font-family:var(--mono);font-size:11.5px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-left:10px}
+
+/* About me: text on the left, background timeline on the right */
+.about-grid{display:grid;gap:36px}
+@media (min-width:900px){.about-grid{grid-template-columns:minmax(0,1fr) minmax(0,380px);gap:64px}}
+.about-text{display:grid;gap:14px;align-content:start;max-width:64ch}
+.about-text p{font-size:16.5px}
+.about-text .mini{margin:10px 0 0}
+.about-text .langs{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{position:relative;display:grid;gap:2px;padding:0 0 24px 28px}
+.tl li::before{content:"";position:absolute;left:5px;top:12px;bottom:-4px;width:1px;background:var(--line)}
+.tl li:last-child{padding-bottom:0}
+.tl li:last-child::before{display:none}
+.tl li::after{content:"";position:absolute;left:0;top:5px;width:11px;height:11px;border-radius:50%;border:2px solid var(--accent);background:var(--bg)}
+.tl li.now::after{background:var(--accent)}
+.tl li.next::after{border-color:var(--muted);border-style:dashed}
+.tl-when{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.tl-what{font-family:var(--display);font-size:1.1rem;font-weight:620;font-stretch:92%;line-height:1.25}
+.tl-what a{text-decoration:none}
+.tl-what a:hover{color:var(--accent)}
+.tl-what a span{color:var(--accent)}
+.tl-where{font-size:14.5px;line-height:1.45;color:var(--muted)}
+
+/* Publications */
+.pub-grid{display:grid;gap:16px}
+@media (min-width:760px){.pub-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* Project grid */
-.projects{margin-top:clamp(44px,7vw,76px)}
 .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:22px}
 .sec-head h2{font-size:1.3rem;font-weight:650;font-stretch:90%}
 .sec-head span{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
@@ -220,7 +247,9 @@ img{max-width:100%}
 <div class="wrap">
   <main id="home">
     <header class="intro" id="intro"></header>
-    <section class="projects" id="projects" aria-labelledby="projects-title">
+    <section class="sect" id="about" aria-labelledby="about-title"></section>
+    <section class="sect" id="publications" aria-labelledby="pubs-title"></section>
+    <section class="sect projects" id="projects" aria-labelledby="projects-title">
       <div class="sec-head"><h2 id="projects-title">Projects</h2><span id="count"></span></div>
       <div class="grid" id="grid"></div>
     </section>
@@ -233,12 +262,22 @@ img{max-width:100%}
 const PROFILE = {
   name: "Anaïs Azouaoui",
   available: "Seeking a 6-month research internship from March 2027",
-  role: "Second-year Master's student in Algorithms, Artificial Intelligence, Interactions & Decision (AI2D) - Sorbonne Université, Paris",
-  bio: [
-    "I am a Master's student in Computer Science at Sorbonne Université, in Paris, with a strong interest in robot learning. My work draws on reinforcement learning, imitation learning, evolutionary computation and computer vision.",
-    "I have worked with the Institute of Intelligent Systems and Robotics (ISIR) on generating robot simulation scenes from text and photos with language models, and with the REVA team at the Toulouse Institute of Computer Science Research (IRIT) on interpretable models for intensive care with genetic programming."
+  role: "MSc student in Computer Science · Sorbonne Université, Paris",
+  pitch: "I am a Master's student in Computer Science at Sorbonne Université, in Paris, with a strong interest in robot learning. My work draws on reinforcement learning, imitation learning, evolutionary computation and computer vision.",
+  about: [
+    "I studied Computer Science at Sorbonne Université, first in the Bachelor's programme and now in the Master's track in Algorithms, Artificial Intelligence, Interactions & Decision (AI2D).",
+    "I have worked with the Institute of Intelligent Systems and Robotics (ISIR) on generating robot simulation scenes from text and photos with language models, and with the REVA team at the Toulouse Institute of Computer Science Research (IRIT) on interpretable models for intensive care with genetic programming.",
+    "Alongside these, I run independent projects on questions I find interesting: whether imitation policies can remember what they have seen, how robust vision-language-action models really are, and how a damaged legged robot can learn to walk again."
   ],
-  interests: ["Robot learning", "Reinforcement learning", "Vision-language-action models", "Computer vision", "3D generation", "Quality-Diversity", "Evolutionary robotics", "LLM-guided evolutionary search"],
+  interests: ["Robot learning", "Reinforcement learning", "Imitation learning", "Evolutionary computation", "Quality-Diversity", "Computer vision", "Vision-language-action models"],
+  languages: "French (native) · English (proficient) · Arabic (proficient) · Japanese (basic)",
+  timeline: [
+    { when: "From March 2027", what: "Research internship, 6 months", where: "Currently looking for a lab", state: "next" },
+    { when: "Jun – Aug 2026", what: "Research internship", where: "Interpretable models for intensive care · REVA team, IRIT, Toulouse", project: "icu-risk" },
+    { when: "Feb – May 2026", what: "Research project", where: "Real-to-Sim scene generation · ISIR, Sorbonne Université", project: "real-to-sim" },
+    { when: "2025 – 2027", what: "Master's in Computer Science", where: "AI2D track · Sorbonne Université, Paris", state: "now" },
+    { when: "2022 – 2025", what: "Bachelor's in Computer Science", where: "Sorbonne Université, Paris" }
+  ],
   links: [
     { label: "CV", url: "assets/cv-anais-azouaoui.pdf" },
     { label: "Email", url: "mailto:anais.azouaoui12@gmail.com" },
@@ -864,18 +903,42 @@ function renderHome() {
   const P = PROFILE;
   const name = P.name;
   $("#intro").innerHTML = `
-    <div class="intro-main">
-    <p class="avail"><span class="dot" aria-hidden="true"></span>${P.available}</p>
+    <div class="top">
+      <p class="avail"><span class="dot" aria-hidden="true"></span>${P.available}</p>
+      <nav aria-label="Sections"><a href="#about">About</a><a href="#publications">Publications</a><a href="#projects">Projects</a></nav>
+    </div>
     <div class="id">
       <div class="photo"><img src="${P.photo}" alt="Portrait of ${displayName()}"></div>
       <div><h1 class="name">${name}</h1><p class="role">${P.role}</p></div>
     </div>
-    ${P.bio.map(b => `<p class="bio">${b}</p>`).join("")}
-    <p class="interests"><b>Interests</b>${P.interests.map(i => `<span>${i}</span>`).join("")}</p>
-    <nav class="links" aria-label="Links">${P.links.map(l => linkBtn(l, false)).join("")}</nav>
-    </div>
-    <aside class="pubs">
-      <h2>Publications <span>in preparation</span></h2>${P.publications.map(q => `<a class="pub" href="#${q.project}"><span class="pub-title">${q.title}</span><span class="pub-authors">${q.authors.replace("A. Azouaoui", "<b>A. Azouaoui</b>")}</span></a>`).join("")}</aside>`;
+    <p class="pitch">${P.pitch}</p>
+    <nav class="links" aria-label="Links">${P.links.map((l, i) => linkBtn(l, i === 0)).join("")}</nav>`;
+
+  $("#about").innerHTML = `
+    <div class="sec-head"><h2 id="about-title">About me</h2></div>
+    <div class="about-grid">
+      <div class="about-text">
+        ${P.about.map(t => `<p>${t}</p>`).join("")}
+        <h3 class="mini">Interests</h3>
+        <ul class="tags">${P.interests.map(i => `<li>${i}</li>`).join("")}</ul>
+        <h3 class="mini">Languages</h3>
+        <p class="langs">${P.languages}</p>
+      </div>
+      <div>
+        <h3 class="mini">Background</h3>
+        <ol class="tl" reversed>${P.timeline.map(t => `
+          <li${t.state ? ` class="${t.state}"` : ""}>
+            <span class="tl-when">${t.when}</span>
+            <span class="tl-what">${t.project ? `<a href="#${t.project}">${t.what} <span aria-hidden="true">→</span></a>` : t.what}</span>
+            <span class="tl-where">${linkOrgs(t.where)}</span>
+          </li>`).join("")}
+        </ol>
+      </div>
+    </div>`;
+
+  $("#publications").innerHTML = `
+    <div class="sec-head"><h2 id="pubs-title">Publications<span>in preparation</span></h2><span>${P.publications.length} manuscripts</span></div>
+    <div class="pub-grid">${P.publications.map(q => `<a class="pub" href="#${q.project}"><span class="pub-title">${q.title}</span><span class="pub-authors">${q.authors.replace("A. Azouaoui", "<b>A. Azouaoui</b>")}</span></a>`).join("")}</div>`;
 
   $("#count").textContent = `${PROJECTS.length} project${PROJECTS.length > 1 ? "s" : ""}`;
   $("#grid").innerHTML = PROJECTS.map(p => `
@@ -989,7 +1052,8 @@ function route() {
   } else {
     home.hidden = false; detail.hidden = true;
     document.title = `${PROFILE.name} · Research portfolio`;
-    if (id === "projects") requestAnimationFrame(() => $("#projects").scrollIntoView());
+    const target = id && document.getElementById(id);
+    if (target) requestAnimationFrame(() => target.scrollIntoView());
     else window.scrollTo(0, 0);
   }
   observeCanvases();
