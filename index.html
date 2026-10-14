@@ -256,6 +256,73 @@ const PROFILE = {
 
 const PROJECTS = [
   {
+    id: "robosimon",
+    title: "RoboSimon: memory in ACT and Diffusion Policy",
+    year: "2026",
+    context: "Independent research project",
+    status: "done",
+    blurb: "Imitation policies such as ACT and Diffusion Policy usually act from the last one or two camera frames. In RoboSimon, a simulated version of the game Simon, a sequence of buttons is shown and then hidden, so the policy can only succeed if it remembers what it saw. A controlled comparison of the two policy families with the same image-history module, analysed under a pre-registered plan.",
+    art: "seyes",
+    media: { type: "image", src: "assets/robosimon/thumb.gif", alt: "Four policies on the same episode: ACT without memory, ACT with an image history, Diffusion Policy after 20k and after 60k training iterations." },
+    hero: {
+      html: `<div class="vids four">
+        <figure class="vid"><img src="assets/robosimon/act_no_memory.gif" style="aspect-ratio:1/1;object-fit:contain" alt="ACT without memory never leaves its rest pose" loading="lazy"><figcaption><b>ACT, no memory</b><span>never starts</span></figcaption></figure>
+        <figure class="vid"><img src="assets/robosimon/act_history.gif" style="aspect-ratio:1/1;object-fit:contain" alt="ACT with an image history presses blue, yellow and red" loading="lazy"><figcaption><b>ACT, image history</b><span>success</span></figcaption></figure>
+        <figure class="vid"><img src="assets/robosimon/dp_history_20k.gif" style="aspect-ratio:1/1;object-fit:contain" alt="Diffusion Policy after 20k iterations presses blue then green" loading="lazy"><figcaption><b>Diffusion Policy, 20k iterations</b><span>wrong second button</span></figcaption></figure>
+        <figure class="vid"><img src="assets/robosimon/dp_history_60k.gif" style="aspect-ratio:1/1;object-fit:contain" alt="Diffusion Policy after 60k iterations presses blue, yellow and red" loading="lazy"><figcaption><b>Diffusion Policy, 60k iterations</b><span>success</span></figcaption></figure>
+      </div>`,
+      caption: "One test episode (blue, yellow, red) played by four policies. The banner gives the sequence that was shown and the buttons pressed, framed in green when correct and red otherwise."
+    },
+    tags: ["Imitation learning", "Memory", "ACT", "Diffusion Policy"],
+    tools: ["Python", "PyTorch", "MuJoCo", "ResNet-18", "zarr", "LaTeX"],
+    keywords: ["Behaviour cloning", "Action chunking", "Partial observability", "ACT", "Diffusion Policy", "Copycat problem", "Linear probes", "Counterfactual evaluation", "Pre-registration", "Bootstrap confidence intervals"],
+    facts: [
+      ["Period", "Jul 2026"],
+      ["Task", "Simon game in MuJoCo, sequences of 2 to 4 buttons, 2 s delay before execution"],
+      ["Scale", "104 trained policies, 100 paired test episodes per policy"],
+      ["Format", "Solo project"]
+    ],
+    sections: [
+      { h: "Question", html: `<p>A policy that only sees the current frame cannot solve a task in which the relevant information has disappeared from view. The obvious remedy is to give it a history of past frames, but two failure modes are documented: the policy may ignore the history, or it may learn to continue whatever it was doing, the copycat problem described by Wen et al. (2020). I wanted to know whether compact policies trained on a few hundred demonstrations actually use an image history when the task requires memory, and whether letting them see their own past positions makes them copy their previous motion.</p>` },
+      { h: "RoboSimon", html: `<p>Four buttons light up one after the other, all lights go off for 2 s, and a white light gives the start signal. A finger driven in Cartesian space must then press the buttons in the order they were shown. The motor part is kept trivial on purpose, so that a failure can only come from memory, and a policy with no access to the sequence succeeds with probability exactly 4<sup>−L</sup> for a sequence of length L. A scripted expert provides 500 demonstrations per length.</p>
+      <figure class="shot wide">
+        <a href="assets/robosimon/teaser.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/robosimon/teaser.png" alt="Top row: the three lights of the sequence, the delay and the start signal. Bottom row: the last frame of the same episode for four policies." loading="lazy"></a>
+        <figcaption>Top: what the policy sees during the presentation, the delay and the start signal. Bottom: how the same episode ends for the four policies above.</figcaption>
+      </figure>` },
+      { h: "Method", html: `<p>ACT and Diffusion Policy receive exactly the same memory module: frames from a frozen ResNet-18, one every 0.2 s since the start of the episode, are read by a small transformer and summarised into four memory tokens. Only the action head differs between the two families. Each family is trained without memory, with the image history, with the image history plus the finger's past positions, and as an oracle that is given the sequence.</p>
+        <p>Besides success, three diagnostics describe how a policy fails. The inertia index is the fraction of the expert's decision points at which the policy's predicted actions stay closer to its previous motion than to the expert's. Linear probes test whether the sequence can be read from the memory tokens, and a counterfactual test swaps the displayed sequence for another one and checks which of the two the policy follows. Hypotheses, contrasts and decision rules were committed to the repository before the main experiment, checkpoints were selected on validation episodes, and all methods were evaluated on the same test episodes, with bootstrap intervals over seeds and episodes.</p>` },
+      { h: "Results", html: `<div class="figs">
+          <div class="fig"><b>100%</b><span>test success of ACT with an image history, for sequences of 2, 3 and 4 buttons</span></div>
+          <div class="fig"><b>46% → 99.7%</b><span>Diffusion Policy at length 3, from 20k to 60k training iterations, confirmed on 12 new seeds</span></div>
+          <div class="fig"><b>r = −0.95</b><span>correlation between the inertia index and success across 20 under-trained Diffusion Policy seeds</span></div>
+        </div>
+        <p>The policy without memory stays at chance level or below, and no probe recovers the sequence from the scene once the presentation is over, so the task cannot be solved without memory. ACT with the image history succeeds in every test episode at all three lengths, and adding its past positions changes nothing. Diffusion Policy, trained for the 20k iterations fixed in the protocol, reaches 78, 46 and 34% for sequences of length 2, 3 and 4, with seeds ranging from 1 to 97%. The seeds that fail keep their current motion when the expert would switch to a new button, and showing them their past positions makes this worse.</p>
+        <figure class="shot wide">
+          <a href="assets/robosimon/success_by_length.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/robosimon/success_by_length.png" alt="Success against sequence length for ACT and Diffusion Policy variants." loading="lazy"></a>
+          <figcaption>Test success against sequence length (3 seeds × 100 episodes per point, 95% bootstrap intervals). The green curve is Diffusion Policy trained for 60k iterations.</figcaption>
+        </figure>
+        <figure class="shot wide">
+          <a href="assets/robosimon/copycat.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/robosimon/copycat.png" alt="Per-seed success and inertia index for the image history with and without past positions." loading="lazy"></a>
+          <figcaption>Success and inertia index with and without the past positions, one dot per seed. Copycat behaviour appears only for under-trained Diffusion Policy and is gone after 60k iterations.</figcaption>
+        </figure>` },
+      { h: "Why Diffusion Policy seemed to forget", html: `<p>I first tried two fixes suggested by the diagnostics and by the literature: predicting the past actions as well as the future ones (Torne et al., 2025), and giving the policy a single frame so that it could not infer its destination from its velocity. Neither helped. Training three times longer did: with 60k iterations, Diffusion Policy succeeds in 99.7% of the episodes at every length, on seeds that were not used to choose the method, and its past positions no longer affect it.</p>
+        <p>The learning curves show why the original budget was too short. The training loss of every variant has flattened by 20k iterations, which is why that budget looked sufficient, but the validation success of the image-history policy is only about half-way at that point and reaches its maximum around 40k iterations. Choosing the right button is a small part of the denoising loss and is learned late. The copycat behaviour was a stage of training, not a property of Diffusion Policy, and a budget calibrated on policies without memory is enough to make a working memory look broken.</p>
+        <figure class="shot wide">
+          <a href="assets/robosimon/learning_curves.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/robosimon/learning_curves.png" alt="Left, training loss curves flattening before 20k iterations; right, validation success of Diffusion Policy rising until about 40k iterations." loading="lazy"></a>
+          <figcaption>Diffusion Policy at length 3. Left: training loss, one line per run. Right: validation success of the image-history policy at each checkpoint, with ACT for comparison.</figcaption>
+        </figure>` },
+      { h: "Rollouts", html: `<figure class="shot wide"><img src="assets/robosimon/past_state.gif" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="Three policies that also see their past finger positions: ACT succeeds, Diffusion Policy after 20k iterations presses yellow twice, Diffusion Policy after 60k iterations succeeds" loading="lazy"><figcaption>With the past finger positions in the history. ACT is unaffected; Diffusion Policy after 20k iterations presses yellow a second time instead of moving on, a typical copycat error; after 60k iterations it completes the sequence.</figcaption></figure>
+        <figure class="shot wide"><img src="assets/robosimon/comparison_L4.gif" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="A four-button sequence: ACT succeeds, Diffusion Policy after 20k iterations fails, Diffusion Policy after 60k iterations succeeds" loading="lazy"><figcaption>A four-button sequence (yellow, blue, blue, yellow) for ACT and for Diffusion Policy after 20k and 60k iterations.</figcaption></figure>
+        <figure class="shot medium"><img src="assets/robosimon/counterfactual.gif" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="Both policies are shown a different sequence and press the first button they were shown" loading="lazy"><figcaption>Counterfactual test: the presentation was replaced by another sequence (“shown”). Both policies press the first button of the sequence they saw, which shows that they act on their memory.</figcaption></figure>` },
+      { h: "My contribution", html: `<p>Solo project. I built the MuJoCo scene, the environment and the scripted expert with their tests, generated the demonstrations and the frozen image embeddings, re-implemented the ACT and Diffusion Policy heads and the memory module, wrote the batched closed-loop evaluation and the diagnostics, ran the trainings on the university's GPU machines, and wrote the statistical analysis and the report, whose tables and figures are all generated from the per-episode results.</p>` },
+      { h: "Limitations", html: `<p>The study is limited to simulation, a Cartesian finger rather than an articulated arm, one frozen image encoder and one memory architecture. Three seeds per condition were enough for ACT but not for Diffusion Policy, and the ten-seed extension was decided after seeing the first results. Longer training fixes Diffusion Policy here, but learning curves at every length would be needed to say how much training is enough in general.</p>` }
+    ],
+    links: [
+      { label: "GitHub", url: "https://github.com/ananalab/robosimon" },
+      { label: "Report (PDF)", url: "assets/robosimon/report.pdf" }
+    ]
+  },
+  {
     id: "vla-robustness",
     title: "Stress-testing a vision-language-action model",
     year: "2026",
@@ -277,6 +344,7 @@ const PROJECTS = [
     tools: ["Python", "PyTorch", "LeRobot", "LIBERO", "MuJoCo", "PPO"],
     keywords: ["Vision-language-action models", "SmolVLA", "Language grounding", "Distribution shift", "Dose-response curves", "Robustness evaluation", "Residual reinforcement learning", "PPO", "LIBERO", "Wilson intervals"],
     facts: [
+      ["Period", "Aug – Sep 2026"],
       ["Model", "SmolVLA, 450M parameters (checkpoint lerobot/smolvla_libero)"],
       ["Benchmark", "LIBERO, simulated Franka arm in MuJoCo"],
       ["Scale", "3,688 episodes, about 40 hours of compute"]
@@ -365,6 +433,7 @@ const PROJECTS = [
     tools: ["Python", "JAX", "QDax", "Brax", "TD3"],
     keywords: ["Quality-Diversity", "Damage recovery", "Intelligent Trial and Error", "MAP-Elites", "DCRL-ME", "TD3", "Gaussian processes", "Bayesian optimisation", "Legged locomotion", "PGA-ME", "Brax"],
     facts: [
+      ["Period", "May – Aug 2026"],
       ["Robot", "Ant (four legs, eight motors), simulated in Brax"],
       ["Scale", "9 repertoires, 12 damages, 4.6 million episodes to build the repertoires"],
       ["Format", "Solo project"]
@@ -498,7 +567,7 @@ const PROJECTS = [
   {
     id: "sign-recognition",
     title: "Real-time sign recognition with a CNN, from ASL to French Belgian Sign Language",
-    year: "2026",
+    year: "2025",
     context: "Independent research project",
     status: "done",
     blurb: "Recognition of isolated signs from a webcam, in real time and entirely in the browser, from body, hand and lip landmarks. Evaluation on signers never seen during training, and study of transfer from American Sign Language (ASL) to French Belgian Sign Language (LSFB).",
@@ -517,6 +586,7 @@ const PROJECTS = [
     tools: ["Python", "PyTorch", "MediaPipe Holistic", "ONNX", "ONNX Runtime Web", "JavaScript", "Kaggle GPUs", "pytest"],
     keywords: ["Isolated sign recognition", "Transfer learning", "Signer-independent evaluation", "Pose landmarks", "Conv-Transformer", "MediaPipe Holistic", "Bidirectional GRU", "ONNX Runtime Web", "Data augmentation"],
     facts: [
+      ["Period", "Nov – Dec 2025"],
       ["Task", "Isolated sign recognition, closed vocabulary"],
       ["Input", "MediaPipe Holistic landmarks: 89 points per frame (hands, upper body, lips)"],
       ["Model", "Convolutional neural network with self-attention (Conv-Transformer, 2.2 M parameters), compared with a bidirectional GRU"],
@@ -597,7 +667,7 @@ const PROJECTS = [
     links: [
       { label: "Live demo", url: "assets/sign-recognition/demo/index.html" },
       { label: "Paper (PDF)", url: "assets/sign-recognition/paper.pdf" },
-      { label: "GitHub", url: "https://github.com/ananalab/Real-time-sign-recognition-with-a-Conv-Transformer-on-MediaPipe-landmarks" }
+      { label: "GitHub", url: "https://github.com/ananalab/Sign-recognition-with-a-Conv-Transformer" }
     ]
   },
   {
@@ -617,6 +687,7 @@ const PROJECTS = [
     tools: ["Python", "librosa", "LightGBM", "XGBoost", "scikit-learn", "Optuna", "Perch embeddings"],
     keywords: ["Bioacoustics", "Multi-label classification", "Domain shift", "Acoustic features", "Perch embeddings", "LightGBM", "Pseudo-labeling", "MFCC", "Grouped cross-validation", "Bayesian optimisation", "ROC-AUC"],
     facts: [
+      ["Period", "May 2026"],
       ["Task", `<a class="ext" href="https://www.kaggle.com/competitions/birdclef-2026" target="_blank" rel="noopener">BirdCLEF+ 2026</a> Kaggle competition, Pantanal (Brazil)`],
       ["Data", "35,549 focal recordings (234 species) and 10,658 field soundscapes, 66 of them annotated"],
       ["Constraint", "No neural network trained"],
@@ -719,6 +790,7 @@ const PROJECTS = [
     tools: ["Python", "JAX", "MuJoCo Playground", "Brax PPO", "Gemma 4 (Ollama)"],
     keywords: ["Reward design", "Reward hacking", "VLM", "Eureka", "PPO", "Visual feedback", "MuJoCo Playground"],
     facts: [
+      ["Period", "Since Oct 2026"],
       ["Status", "In progress"],
       ["Format", "Solo project"],
       ["Setting", "Simulated locomotion tasks (MuJoCo Playground)"]
@@ -745,6 +817,7 @@ const PROJECTS = [
     tools: ["Python"],
     keywords: ["Human-AI interaction", "Education", "Controlled study", "Learning assessment"],
     facts: [
+      ["Period", "Sep 2026 – Feb 2027"],
       ["Status", "In progress"],
       ["Duration", "6 months"],
       ["Format", "Team project"]
