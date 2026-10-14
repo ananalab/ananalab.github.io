@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=IBM+Plex+Mono:wght@400;500&family=Atkinson+Hyperlegible+Next:ital,wght@0,400..600;1,400&display=swap">
 <style>
-/* Layout: a top bar (availability, section and contact links), the intro (name, pitch, interests) with the
+/* Layout: a top bar (section and contact links), the intro (name, pitch, interests) with the
    publications on its right, the project archive (a two-column grid of cards), then About me (text and a
    background timeline). Each card opens its own page at #project-id. */
 :root{
@@ -53,16 +53,27 @@ p{margin:0}
 strong{font-weight:600}
 
 /* Intro */
-.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;margin-bottom:28px}
+.top{display:flex;justify-content:flex-end;margin-bottom:28px}
 .intro{display:grid;gap:40px}
 .intro-main{display:grid;gap:18px;min-width:0}
 @media (min-width:980px){.intro{grid-template-columns:minmax(0,1fr) 320px;gap:56px;align-items:start}}
 .pubs{display:grid;gap:12px;align-self:center}
 .pubs h2{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0}
 .pubs h2 span{color:var(--accent);margin-left:6px}
-.top nav{display:flex;flex-wrap:wrap;gap:6px 20px;font-family:var(--mono);font-size:12.5px}
-.top nav a{color:var(--muted);text-decoration:none;transition:color .15s}
-.top nav a:hover{color:var(--accent)}
+.top nav{display:flex;align-items:center;gap:2px;padding:4px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-family:var(--mono);font-size:12.5px;font-weight:500}
+.top nav a{padding:6px 14px;border-radius:999px;color:var(--ink);text-decoration:none;transition:background-color .15s,color .15s}
+.top nav a:hover{background:var(--accent-soft);color:var(--accent)}
+.top nav a.cv{background:var(--accent);color:var(--on-accent)}
+.top nav a.cv:hover{background:color-mix(in srgb,var(--accent) 85%,var(--ink))}
+.top nav .sep{width:1px;align-self:stretch;margin:5px 4px;background:var(--line)}
+@media (max-width:560px){
+  .top{justify-content:flex-start}
+  .top nav{flex-wrap:wrap;gap:6px;padding:0;border:0;background:none}
+  .top nav{font-size:12px}
+  .top nav a{border:1px solid var(--line);background:var(--surface);padding:5px 10px}
+  .top nav a.cv{border-color:var(--accent)}
+  .top nav .sep{display:none}
+}
 .photo{flex:none;width:clamp(76px,11vw,116px);aspect-ratio:1;border-radius:50%;overflow:hidden;background:var(--sunk)}
 .photo img{width:100%;height:100%;object-fit:cover;display:block}
 .pub{display:grid;gap:6px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s}
@@ -70,9 +81,6 @@ strong{font-weight:600}
 .pub-title{font-size:15px;line-height:1.35;font-weight:500}
 .pub-authors{font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.45}
 .pub-authors b{color:var(--ink);font-weight:500}
-.avail{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--muted);letter-spacing:.02em}
-.avail .dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);animation:ping 2.4s ease-out infinite}
-@keyframes ping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}70%,100%{box-shadow:0 0 0 7px transparent}}
 .id{display:flex;align-items:center;gap:18px}
 .id > div{min-width:0}
 .name{font-size:clamp(2.3rem,6.5vw,3.9rem);font-weight:720;font-stretch:82%;letter-spacing:-.025em;line-height:.95}
@@ -258,9 +266,8 @@ img{max-width:100%}
 <script>
 const PROFILE = {
   name: "Anaïs Azouaoui",
-  available: "Seeking a 6-month research internship from March 2027",
   role: "MSc student in Computer Science · Sorbonne Université, Paris",
-  pitch: "I am a Master's student in Computer Science at Sorbonne Université, in Paris, with a strong interest in robot learning. My work draws on reinforcement learning, imitation learning, evolutionary computation and computer vision.",
+  pitch: "I am a Master's student in Computer Science at Sorbonne Université, in Paris, with a strong interest in robot learning. My work draws on reinforcement learning, imitation learning, evolutionary computation and computer vision. I am currently seeking a six-month research internship starting in March 2027.",
   about: [
     "I studied Computer Science at Sorbonne Université, first in the Bachelor's programme and now in the Master's track in Algorithms, Artificial Intelligence, Interactions & Decision (AI2D).",
     "I have worked with the Institute of Intelligent Systems and Robotics (ISIR) on generating robot simulation scenes from text and photos with language models, and with the REVA team at the Toulouse Institute of Computer Science Research (IRIT) on interpretable models for intensive care with genetic programming.",
@@ -872,7 +879,7 @@ const displayName = () => PROFILE.name;
 
 function topLink(l) {
   const external = /^https?:/.test(l.url) || /\.(pdf|html)$/i.test(l.url);
-  return `<a href="${l.url}"${external ? ` target="_blank" rel="noopener"` : ""}>${l.label}</a>`;
+  return `<a${l.label === "CV" ? ` class="cv"` : ""} href="${l.url}"${external ? ` target="_blank" rel="noopener"` : ""}>${l.label}</a>`;
 }
 
 function thumbHTML(p) {
@@ -901,8 +908,7 @@ function renderHome() {
   const name = P.name;
   $("#intro").innerHTML = `
     <div class="top">
-      <p class="avail"><span class="dot" aria-hidden="true"></span>${P.available}</p>
-      <nav aria-label="Sections and links"><a href="#projects">Projects</a>${P.links.map(topLink).join("")}<a href="#about">About me</a></nav>
+      <nav aria-label="Sections and links"><a href="#projects">Projects</a><span class="sep" aria-hidden="true"></span>${P.links.map(topLink).join("")}<span class="sep" aria-hidden="true"></span><a href="#about">About me</a></nav>
     </div>
     <div class="intro">
       <div class="intro-main">
