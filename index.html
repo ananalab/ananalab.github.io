@@ -904,6 +904,7 @@ return nominal_.front();  // first command sent; the rest warm-starts the next c
   },
   {
     id: "llm-reward",
+    hidden: true, // unfinished: remove this line to show it again
     title: "Can a VLM write a robot's reward?",
     year: "2026",
     context: "Independent research project",
@@ -954,7 +955,7 @@ return nominal_.front();  // first command sent; the rest warm-starts the next c
     ],
     links: []
   }
-];
+].filter(p => !p.hidden);
 
 /* ---------- rendering ---------- */
 const $ = s => document.querySelector(s);
