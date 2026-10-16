@@ -538,7 +538,7 @@ const PROJECTS = [
     media: { type: "video", src: "assets/robot-nav/thumb.mp4", poster: "assets/robot-nav/thumb.jpg" },
     hero: {
       html: `<figure class="shot wide"><img src="assets/robot-nav/real-mppi.gif" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="The real robot drives to five goals around three red obstacles with MPPI" loading="lazy"></figure>`,
-      caption: "The real robot with MPPI, five chained goals around three flat red obstacles (3× speed). Left: camera image with the detected markers and the planned path. Right: the occupancy grid used by the planner, in which obstacles are inflated by the size of the robot."
+      caption: "The real robot with MPPI, five chained goals around three flat red obstacles (3× speed). Left: overhead camera image, cropped to the arena, with the detected markers and the planned path. Right: the occupancy grid used by the planner, in which obstacles are inflated by the size of the robot."
     },
     tags: ["C++", "State estimation", "Motion planning", "Model predictive control"],
     tools: ["C++17", "Eigen", "OpenCV", "CMake", "GoogleTest", "Arduino (C++)"],
@@ -546,7 +546,6 @@ const PROJECTS = [
     facts: [
       ["Period", "Oct 2026"],
       ["Robot", "Self-built Arduino car, L298N driver, ESP8266 Wi-Fi link"],
-      ["Code", "About 7,500 lines of C++17, 85 tests"],
       ["Format", "Solo project"]
     ],
     sections: [
@@ -612,7 +611,8 @@ return nominal_.front();  // first command sent; the rest warm-starts the next c
       { h: "Real-robot runs", html: `<div class="vids">
           <figure class="vid"><video src="assets/robot-nav/real-pp.mp4" poster="assets/robot-nav/real-pp.jpg" controls muted playsinline preload="metadata" aria-label="Real robot, Pure Pursuit, five chained goals"></video><figcaption><b>Pure Pursuit</b><span>five goals, real time</span></figcaption></figure>
           <figure class="vid"><video src="assets/robot-nav/real-mppi.mp4" poster="assets/robot-nav/real-mppi.jpg" controls muted playsinline preload="metadata" aria-label="Real robot, MPPI, five chained goals"></video><figcaption><b>MPPI</b><span>five goals, real time</span></figcaption></figure>
-        </div>` }
+        </div>` },
+      { h: "Simulated runs", html: `<figure class="shot wide"><video src="assets/robot-nav/sim-mppi.mp4" poster="assets/robot-nav/sim-mppi.jpg" controls muted playsinline preload="metadata" style="width:100%;height:auto;border:1px solid var(--line);border-radius:var(--radius)" aria-label="Simulated robot, MPPI, same five goals and obstacles as the real runs"></video><figcaption>The same five goals and obstacle layout in the simulator, with MPPI. Left: rendered camera image; right: occupancy grid.</figcaption></figure>` }
     ],
     links: [
       { label: "GitHub", url: "https://github.com/ananalab/robot-nav" }
