@@ -529,26 +529,24 @@ const PROJECTS = [
   },
   {
     id: "robot-nav",
-    title: "Camera-guided navigation of a small wheeled robot in C++",
+    title: "Camera-guided navigation of a self-built wheeled robot in C++",
     year: "2026",
     context: "Independent project",
-    status: "ongoing",
-    blurb: "A navigation stack written from scratch in C++17 for a two-wheeled robot that is located only by an overhead camera: marker-based localisation, an extended Kalman filter that compensates the camera delay, A* planning, and two controllers, Pure Pursuit and MPPI. The same code is evaluated in a simulator and runs on the real robot.",
+    status: "done",
+    blurb: "A self-built two-wheeled robot with no onboard sensing, located only by an overhead camera. The navigation stack is written from scratch in C++17: marker-based localisation, an extended Kalman filter that compensates the camera delay, A* planning, and two controllers, Pure Pursuit and MPPI. The same code runs in a simulator and on the real robot, which reaches its goals within 2 cm while avoiding obstacles.",
     art: "duo",
     media: { type: "video", src: "assets/robot-nav/thumb.mp4", poster: "assets/robot-nav/thumb.jpg" },
     hero: {
-      html: `<div class="vids">
-        <figure class="vid"><video src="assets/robot-nav/sim-mppi.mp4" poster="assets/robot-nav/sim-mppi-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Simulated run in which the robot drives around three obstacles"></video><figcaption><b>Simulated run, MPPI</b><span>final error 8 mm</span></figcaption></figure>
-      </div>`,
-      caption: "Left: the simulated camera image, with the detected markers and the planned path. Right: the occupancy grid used by the planner, in which obstacles are inflated by the size of the robot."
+      html: `<figure class="shot wide"><img src="assets/robot-nav/real-mppi.gif" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="The real robot drives to five goals around three red obstacles with MPPI" loading="lazy"></figure>`,
+      caption: "The real robot with MPPI, five chained goals around three flat red obstacles (3× speed). Left: camera image with the detected markers and the planned path. Right: the occupancy grid used by the planner, in which obstacles are inflated by the size of the robot."
     },
     tags: ["C++", "State estimation", "Motion planning", "Model predictive control"],
     tools: ["C++17", "Eigen", "OpenCV", "CMake", "GoogleTest", "Arduino (C++)"],
     keywords: ["Extended Kalman filter", "Latency compensation", "A*", "Distance transform", "Pure Pursuit", "MPPI", "Fiducial markers", "Camera calibration", "Sim-to-real"],
     facts: [
       ["Period", "Oct 2026"],
-      ["Status", "Simulation complete, real-robot experiments pending"],
-      ["Code", "About 7,400 lines of C++17, 85 tests"],
+      ["Robot", "Self-built Arduino car, L298N driver, ESP8266 Wi-Fi link"],
+      ["Code", "About 7,500 lines of C++17, 85 tests"],
       ["Format", "Solo project"]
     ],
     sections: [
@@ -589,18 +587,32 @@ for (int t = 0; t &lt; steps; ++t) {
                                  -limits_.omega_max, limits_.omega_max);
 }
 return nominal_.front();  // first command sent; the rest warm-starts the next cycle</code></pre>` },
-      { h: "Results in simulation", html: `<p>The simulator is deliberately imperfect: the two motors differ by 10%, respond late and slip, and the camera image is delayed, noisy and sometimes missing. The controller knows none of this. With the camera in the loop, both controllers reach their goal within about 1 cm; in the narrowest passages, a pose error of one or two centimetres is enough for Pure Pursuit to touch an obstacle, while MPPI keeps a margin.</p>
+      { h: "Results on the real robot", html: `<p>Three flat red sheets were laid in the arena and each controller drove the robot through the same five chained goals, with the pose measured by the camera.</p>
         <div class="tbl-wrap"><table class="tbl">
-          <thead><tr><th>Scenarios</th><th>Controller</th><th class="num">Success</th><th class="num">Collisions</th><th class="num">Final error (median)</th></tr></thead>
+          <thead><tr><th>Controller</th><th class="num">Goals reached</th><th class="num">Final error (median / max)</th><th class="num">Time per goal (median)</th><th class="num">Obstacle contacts</th></tr></thead>
           <tbody>
-            <tr><td>20 random, 0 to 2 obstacles</td><td>Pure Pursuit</td><td class="num">100%</td><td class="num">0</td><td class="num">10.0 mm</td></tr>
-            <tr><td></td><td>MPPI</td><td class="num">100%</td><td class="num">0</td><td class="num">9.3 mm</td></tr>
-            <tr><td>9 narrow passages and slaloms</td><td>Pure Pursuit</td><td class="num">93%</td><td class="num">3</td><td class="num">8.4 mm</td></tr>
-            <tr><td></td><td>MPPI</td><td class="num">100%</td><td class="num">0</td><td class="num">7.8 mm</td></tr>
+            <tr><td>Pure Pursuit</td><td class="num">5 / 5</td><td class="num">0.9 / 1.7 cm</td><td class="num">7.4 s</td><td class="num">2</td></tr>
+            <tr><td>MPPI</td><td class="num">5 / 5</td><td class="num">1.0 / 1.1 cm</td><td class="num">7.6 s</td><td class="num">0</td></tr>
           </tbody>
-          <caption>Simulated camera in the loop, 5 runs per scenario.</caption>
-        </table></div>` },
-      { h: "Real robot", html: `<p>Pending. The next steps are to identify the real motors, run the same comparison on the real robot, and measure how far its behaviour departs from the simulation.</p>` }
+          <caption>Real robot, five chained goals per controller.</caption>
+        </table></div>
+        <p>Both controllers reach every goal within 2 cm. Pure Pursuit follows the planned path geometrically and cut two corners over the edge of a sheet; MPPI, which scores obstacle proximity in its rollouts, never touched one.</p>` },
+      { h: "Results in simulation", html: `<p>The simulator renders the camera image with the real resolution and focal length, a 150 ms delay, dropped frames, blur and noise, and its motors differ from the model known to the controller. With the camera and the EKF in the loop, MPPI reached the goal without collision in 143 of 145 runs; Pure Pursuit, which only follows the path geometrically, touched obstacles in the narrow passages, as on the real robot.</p>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Scenarios</th><th>Controller</th><th class="num">Goal reached</th><th class="num">Collisions</th><th class="num">Final error (median)</th></tr></thead>
+          <tbody>
+            <tr><td>20 random, 0 to 2 obstacles</td><td>Pure Pursuit</td><td class="num">90 / 100</td><td class="num">8</td><td class="num">7.7 mm</td></tr>
+            <tr><td></td><td>MPPI</td><td class="num">100 / 100</td><td class="num">0</td><td class="num">7.2 mm</td></tr>
+            <tr><td>9 narrow passages and slaloms</td><td>Pure Pursuit</td><td class="num">26 / 45</td><td class="num">14</td><td class="num">8.1 mm</td></tr>
+            <tr><td></td><td>MPPI</td><td class="num">43 / 45</td><td class="num">0</td><td class="num">7.1 mm</td></tr>
+          </tbody>
+          <caption>Simulated camera and EKF in the loop, 5 runs per scenario. Goal reached: within 2 cm, without collision.</caption>
+        </table></div>
+        <p>A final heading within 5°, requested in some scenarios, is usually met with the true pose but not with the camera in the loop: the minimum wheel command needed to overcome static friction on the real robot makes the final rotation too coarse.</p>` },
+      { h: "Real-robot runs", html: `<div class="vids">
+          <figure class="vid"><video src="assets/robot-nav/real-pp.mp4" poster="assets/robot-nav/real-pp.jpg" controls muted playsinline preload="metadata" aria-label="Real robot, Pure Pursuit, five chained goals"></video><figcaption><b>Pure Pursuit</b><span>five goals, real time</span></figcaption></figure>
+          <figure class="vid"><video src="assets/robot-nav/real-mppi.mp4" poster="assets/robot-nav/real-mppi.jpg" controls muted playsinline preload="metadata" aria-label="Real robot, MPPI, five chained goals"></video><figcaption><b>MPPI</b><span>five goals, real time</span></figcaption></figure>
+        </div>` }
     ],
     links: [
       { label: "GitHub", url: "https://github.com/ananalab/robot-nav" }
