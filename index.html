@@ -225,6 +225,12 @@ p.scene-in{max-width:42%;margin:0;padding:6px 9px;background:rgba(255,255,255,.8
 .d-main section{display:grid;gap:12px}
 .d-main h2{font-size:1.25rem;font-weight:650;font-stretch:90%}
 .d-main ul{margin:0;padding-left:1.1em;display:grid;gap:8px}
+.d-main .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.d-main .flow div{display:grid;gap:2px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:14px}
+.d-main .flow b{font-weight:600}
+.d-main .flow span{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.d-main .flow i{font-style:normal;color:var(--accent)}
+.d-main pre.code{margin:0;padding:14px 16px;overflow-x:auto;background:var(--sunk);border:1px solid var(--line);border-radius:var(--radius);font-family:var(--mono);font-size:12.5px;line-height:1.55;color:var(--ink)}
 .d-main li::marker{color:var(--accent)}
 .figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
 .fig{border-top:2px solid var(--accent);padding-top:10px;display:grid;gap:6px;align-content:start}
@@ -519,6 +525,85 @@ const PROJECTS = [
     links: [
       { label: "GitHub", url: "https://github.com/ananalab/qd-damage-recovery" },
       { label: "Report (PDF)", url: "assets/qd-damage/report.pdf" }
+    ]
+  },
+  {
+    id: "robot-nav",
+    title: "Camera-guided navigation of a small wheeled robot in C++",
+    year: "2026",
+    context: "Independent project",
+    status: "ongoing",
+    blurb: "A navigation stack written from scratch in C++17 for a two-wheeled robot that is located only by an overhead camera: marker-based localisation, an extended Kalman filter that compensates the camera delay, A* planning, and two controllers, Pure Pursuit and MPPI. The same code is evaluated in a simulator and runs on the real robot.",
+    art: "duo",
+    media: { type: "video", src: "assets/robot-nav/thumb.mp4", poster: "assets/robot-nav/thumb.jpg" },
+    hero: {
+      html: `<div class="vids">
+        <figure class="vid"><video src="assets/robot-nav/sim-mppi.mp4" poster="assets/robot-nav/sim-mppi-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Simulated run in which the robot drives around three obstacles"></video><figcaption><b>Simulated run, MPPI</b><span>final error 8 mm</span></figcaption></figure>
+      </div>`,
+      caption: "Left: the simulated camera image, with the detected markers and the planned path. Right: the occupancy grid used by the planner, in which obstacles are inflated by the size of the robot."
+    },
+    tags: ["C++", "State estimation", "Motion planning", "Model predictive control"],
+    tools: ["C++17", "Eigen", "OpenCV", "CMake", "GoogleTest", "Arduino (C++)"],
+    keywords: ["Extended Kalman filter", "Latency compensation", "A*", "Distance transform", "Pure Pursuit", "MPPI", "Fiducial markers", "Camera calibration", "Sim-to-real"],
+    facts: [
+      ["Period", "Oct 2026"],
+      ["Status", "Simulation complete, real-robot experiments pending"],
+      ["Code", "About 7,400 lines of C++17, 85 tests"],
+      ["Format", "Solo project"]
+    ],
+    sections: [
+      { h: "Pipeline", html: `<p>The robot has no sensor of its own: everything it knows comes from a camera above the floor. Each image goes through the following chain, at 30 frames per second.</p>
+        <div class="flow">
+          <div><b>Camera</b><span>30 fps</span></div><i>→</i>
+          <div><b>Detection</b><span>markers, obstacles</span></div><i>→</i>
+          <div><b>EKF</b><span>pose, delay</span></div><i>→</i>
+          <div><b>A*</b><span>inflated grid</span></div><i>→</i>
+          <div><b>Pure Pursuit / MPPI</b><span>wheel speeds</span></div><i>→</i>
+          <div><b>Arduino</b><span>Wi-Fi, watchdog</span></div>
+        </div>` },
+      { h: "Algorithms", html: `<ul>
+          <li><strong>Localisation.</strong> Four markers on the floor give the camera pose once. The robot's pose is then obtained in every image by intersecting the rays through the corners of its roof marker with the plane at the roof height, which proved more accurate than a per-marker PnP. Obstacles are segmented by colour and confirmed by a vote over 20 images.</li>
+          <li><strong>State estimation.</strong> An extended Kalman filter on position, heading and velocities fuses these measurements with the commands sent. Images arrive about 150 ms late, so the filter keeps the last two seconds of commands, rewinds to the time an image was taken and replays the commands up to now. Measurements that are inconsistent with the prediction are rejected.</li>
+          <li><strong>Planning.</strong> A* on a 1 cm occupancy grid, inflated by the robot's radius with a linear-time distance transform, then shortened and smoothed.</li>
+          <li><strong>Control.</strong> Pure Pursuit follows the path geometrically. MPPI samples 512 control sequences over a 1.5 s horizon, simulates each with the motion model, scores them on path error, obstacle cost and smoothness, and averages them with exponential weights.</li>
+        </ul>` },
+      { h: "Implementation", html: `<p>The code is organised in separate modules for vision, estimation, planning, control, simulation and hardware, with Eigen for linear algebra and OpenCV for image processing. The simulator implements the same camera and robot interfaces as the hardware, so the navigation code does not know whether it is driving the real car. The parser of the serial protocol is a single header shared by the Arduino firmware, the simulator and the tests. An MPPI cycle takes about 3 ms on a laptop without threads, and the 85 GoogleTest tests range from unit checks to closed-loop runs in simulation.</p>
+        <pre class="code"><code>// MPPI update (src/control.cpp). Each sampled control sequence has been rolled
+// out through the motion model and scored; the nominal sequence moves towards
+// the low-cost samples, weighted by exp(-(S_k - S_min) / lambda).
+const double min_cost = *std::min_element(costs.begin(), costs.end());
+std::vector&lt;double&gt; weights(samples);
+double total = 0.0;
+for (int k = 0; k &lt; samples; ++k) {
+  weights[k] = std::exp(-(costs[k] - min_cost) / config_.lambda);
+  total += weights[k];
+}
+for (int t = 0; t &lt; steps; ++t) {
+  double dv = 0.0, dw = 0.0;
+  for (int k = 0; k &lt; samples; ++k) {
+    dv += weights[k] * eps[k][t].v;
+    dw += weights[k] * eps[k][t].omega;
+  }
+  nominal_[t].v = std::clamp(nominal_[t].v + dv / total, config_.v_min, limits_.v_max);
+  nominal_[t].omega = std::clamp(nominal_[t].omega + dw / total,
+                                 -limits_.omega_max, limits_.omega_max);
+}
+return nominal_.front();  // first command sent; the rest warm-starts the next cycle</code></pre>` },
+      { h: "Results in simulation", html: `<p>The simulator is deliberately imperfect: the two motors differ by 10%, respond late and slip, and the camera image is delayed, noisy and sometimes missing. The controller knows none of this. With the camera in the loop, both controllers reach their goal within about 1 cm; in the narrowest passages, a pose error of one or two centimetres is enough for Pure Pursuit to touch an obstacle, while MPPI keeps a margin.</p>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Scenarios</th><th>Controller</th><th class="num">Success</th><th class="num">Collisions</th><th class="num">Final error (median)</th></tr></thead>
+          <tbody>
+            <tr><td>20 random, 0 to 2 obstacles</td><td>Pure Pursuit</td><td class="num">100%</td><td class="num">0</td><td class="num">10.0 mm</td></tr>
+            <tr><td></td><td>MPPI</td><td class="num">100%</td><td class="num">0</td><td class="num">9.3 mm</td></tr>
+            <tr><td>9 narrow passages and slaloms</td><td>Pure Pursuit</td><td class="num">93%</td><td class="num">3</td><td class="num">8.4 mm</td></tr>
+            <tr><td></td><td>MPPI</td><td class="num">100%</td><td class="num">0</td><td class="num">7.8 mm</td></tr>
+          </tbody>
+          <caption>Simulated camera in the loop, 5 runs per scenario.</caption>
+        </table></div>` },
+      { h: "Real robot", html: `<p>Pending. The next steps are to identify the real motors, run the same comparison on the real robot, and measure how far its behaviour departs from the simulation.</p>` }
+    ],
+    links: [
+      { label: "GitHub", url: "https://github.com/ananalab/robot-nav" }
     ]
   },
   {
