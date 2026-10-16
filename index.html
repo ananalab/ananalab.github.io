@@ -190,6 +190,8 @@ p.scene-in{max-width:42%;margin:0;padding:6px 9px;background:rgba(255,255,255,.8
 .sim-view iframe{display:block;width:100%;height:100%;border:0;color-scheme:normal}
 .vids.four{grid-template-columns:repeat(4,minmax(0,1fr))}
 .vids.four video{aspect-ratio:1/1}
+.vids.wide{grid-template-columns:minmax(0,1fr)}
+.vids.wide video{aspect-ratio:auto}
 @media (max-width:680px){.vids{grid-template-columns:minmax(0,1fr)}.vids.four{grid-template-columns:repeat(2,minmax(0,1fr))}.sim-view{aspect-ratio:4/5}}
 .shots2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
 .shots2 .shot{max-width:none}
@@ -608,7 +610,7 @@ return nominal_.front();  // first command sent; the rest warm-starts the next c
           <caption>Simulated camera and EKF in the loop, 5 runs per scenario. Goal reached: within 2 cm, without collision.</caption>
         </table></div>
         <p>A final heading within 5°, requested in some scenarios, is usually met with the true pose but not with the camera in the loop: the minimum wheel command needed to overcome static friction on the real robot makes the final rotation too coarse.</p>` },
-      { h: "Real-robot runs", html: `<div class="vids">
+      { h: "Real-robot runs", html: `<div class="vids wide">
           <figure class="vid"><video src="assets/robot-nav/real-pp.mp4" poster="assets/robot-nav/real-pp.jpg" controls muted playsinline preload="metadata" aria-label="Real robot, Pure Pursuit, five chained goals"></video><figcaption><b>Pure Pursuit</b><span>five goals, real time</span></figcaption></figure>
           <figure class="vid"><video src="assets/robot-nav/real-mppi.mp4" poster="assets/robot-nav/real-mppi.jpg" controls muted playsinline preload="metadata" aria-label="Real robot, MPPI, five chained goals"></video><figcaption><b>MPPI</b><span>five goals, real time</span></figcaption></figure>
         </div>` },
