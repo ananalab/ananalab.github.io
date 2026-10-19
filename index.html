@@ -469,7 +469,7 @@ const PROJECTS = [
     status: "done",
     blurb: "A simulated quadruped loses the use of a leg. Using a repertoire of gaits learned in advance, it finds a new way to walk in a handful of trials, where re-training with reinforcement learning needs hundreds of episodes. This behavior mimics that of injured animals and was first introduced by Cully et al. (Nature 2015) as Intelligent Trial & Error. A follow-up study on three robots shows that what limits this search is the model it is given, and that learning it from simulated damages makes adaptation clearly better.",
     art: "duo",
-    media: { type: "video", src: "assets/qd-damage/after-ite.mp4", poster: "assets/qd-damage/after-ite.jpg" },
+    media: { type: "video", src: "assets/qd-damage/thumb.mp4", poster: "assets/qd-damage/thumb.jpg" },
     hero: {
       html: `<div class="vids">
         <figure class="vid"><video src="assets/qd-damage/learned/ant/intact.mp4" poster="assets/qd-damage/learned/ant/intact.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Ant - intact"></video><figcaption><b>Ant - intact</b><span>30.5 m</span></figcaption></figure>
@@ -486,7 +486,7 @@ const PROJECTS = [
     },
     tags: ["Quality-Diversity", "Reinforcement learning", "Robot adaptation", "Bayesian optimisation"],
     tools: ["Python", "JAX", "QDax", "Brax", "TD3"],
-    keywords: ["Quality-Diversity", "Damage recovery", "Intelligent Trial and Error", "MAP-Elites", "DCRL-ME", "TD3", "Gaussian processes", "Bayesian optimisation", "Legged locomotion", "PGA-ME", "Brax"],
+    keywords: ["Quality-Diversity", "Damage recovery", "Intelligent Trial and Error", "ITE-SD", "ITE-Sig", "Meta-learning", "MAP-Elites", "DCRL-ME", "TD3", "Gaussian processes", "Bayesian optimisation", "Legged locomotion", "PGA-ME", "Brax"],
     facts: [
       ["Period", "Jul – Sep 2026"],
       ["Robots", "Ant, then Walker2d and HalfCheetah, simulated in Brax"],
@@ -508,14 +508,18 @@ const PROJECTS = [
         <li><strong>Protocol.</strong> First with fresh episodes on Ant, then, to compare 15 methods on three robots, by replaying adaptation from banks in which every gait was played under every condition. Hypotheses written before the final runs, settings tuned on separate development repertoires.</li>
       </ul>
       <figure class="shot">
-        <a href="assets/qd-damage/qd-repertoires-3robots.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/qd-damage/qd-repertoires-3robots.png" alt="Nine maps, one per robot and algorithm: each square is a gait placed by its foot contacts and coloured by its progress; DCRL-ME fills the most cells." loading="lazy"></a>
-        <figcaption>One repertoire per robot and algorithm. Each square is a gait, placed by how often each foot touches the ground (for Ant, feet 1-2 choose the large square and feet 3-4 the position inside it); colour is its progress on the intact robot.</figcaption>
+        <a href="assets/qd-damage/qd-repertoires-row.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/qd-damage/qd-repertoires-row.png" alt="Three maps, one DCRL-ME repertoire per robot: each square is a gait placed by its foot contacts and coloured by its progress on the intact robot." loading="lazy"></a>
+        <figcaption>One gait repertoire per robot (DCRL-ME). Each square is a gait, placed by how often each foot touches the ground (for Ant, feet 1-2 choose the large square and feet 3-4 the position inside it); colour is its progress u on the intact robot (0: standing still, 1: best intact gait).</figcaption>
       </figure>` },
       { h: "1. Repertoires survive damage", html: `<div class="figs">
           <div class="fig"><b>5 to 13×</b><span>better gaits after damage on Ant with repertoires built using RL than with MAP-Elites alone</span></div>
           <div class="fig"><b>p &gt; 0.4</b><span>no difference in the share of intact progress still reachable after damage between algorithms</span></div>
         </div>
         <p>Repertoires built with RL critics are not more fragile: they lose the same share of their progress as MAP-Elites repertoires, while keeping much faster gaits. With two paralysed legs, no repertoire keeps a useful gait.</p>
+        <figure class="shot">
+          <a href="assets/qd-damage/qd-repertoires-3robots.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/qd-damage/qd-repertoires-3robots.png" alt="Nine maps, one per robot and algorithm: each square is a gait placed by its foot contacts and coloured by its progress; DCRL-ME fills the most cells." loading="lazy"></a>
+          <figcaption>One repertoire per robot and algorithm, coloured by progress on the intact robot. DCRL-ME fills the most cells.</figcaption>
+        </figure>
         <figure class="shot">
           <a href="assets/qd-damage/qd-repertoires.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/qd-damage/qd-repertoires.png" alt="Three learning curves over 512,000 episodes: DCRL-ME reaches the highest QD-score and coverage, PGA-ME the fastest gait, MAP-Elites stays lowest on all three." loading="lazy"></a>
           <figcaption>Building the Ant repertoires (median and interquartile range over 3 seeds). DCRL-ME covers the most behaviours, PGA-ME finds the fastest gaits.</figcaption>
@@ -532,8 +536,12 @@ const PROJECTS = [
         </figure>` },
       { h: "3. Learning what a damage does", html: `<p>Before deployment, the simulator that built the repertoire can also break it. Playing every gait under 64 random simulated damages takes minutes on a GPU and no trial on the robot. The mean response gives a better prior, and the covariance a new similarity: two gaits are close if they <em>react alike</em> to damages, whatever their foot contacts. With them, ITE becomes a Bayesian model of the damage itself, in which each trial helps to identify the damage and predicts every gait at once (<strong>ITE-SD</strong>, the empirical-Bayes prior of Wang et al. 2018 applied to a repertoire). <strong>ITE-Sig</strong> also reads the robot's proprioception during each trial (joint angles and speeds, torso motion, foot contacts), so that one trial measures the damage through many numbers instead of one.</p>
         <figure class="shot">
-          <a href="assets/qd-damage/qd-guesses.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/qd-damage/qd-guesses.png" alt="For three damaged robots, maps of what ITE, ITE-SD and ITE-Sig believe every gait achieves, next to reality; a curve shows how well each guess matches reality as trials go by." loading="lazy"></a>
-          <figcaption>What each method believes every gait achieves after a leg is paralysed, against reality. ITE believes the robot is intact; ITE-SD already expects the loss before any trial; after one trial ITE-Sig is close to reality. Right: rank correlation between guess and reality, median over 33 repertoires and all expected damages. Most of ITE-SD's gain comes from its learned starting guess; the learned similarity alone does no better than ITE.</figcaption>
+          <a href="assets/qd-damage/qd-guesses-short.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/qd-damage/qd-guesses-short.png" alt="For three damaged robots, maps of what ITE, ITE-SD and ITE-Sig believe every gait achieves, next to reality; on the right, the progress each method recovers against the number of trials." loading="lazy"></a>
+          <figcaption>Left: what each method believes every gait achieves after a leg is paralysed, against reality. ITE believes the robot is intact; ITE-SD already expects the loss before any trial; after one trial ITE-Sig is close to reality ("match": rank correlation with reality, median over 33 repertoires). Right: progress recovered against the number of trials, leg or joint damages, 33 repertoires. Most of ITE-SD's gain comes from its learned starting guess; the learned similarity alone does no better than ITE.</figcaption>
+        </figure>
+        <figure class="shot">
+          <a href="assets/qd-damage/qd-guesses.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/qd-damage/qd-guesses.png" alt="The same maps with a picture of each robot, and how well each method's guess matches reality as trials go by." loading="lazy"></a>
+          <figcaption>How well each method's guess matches reality, trial after trial: ITE does not improve by trying, ITE-SD starts better, ITE-Sig jumps after the first trial.</figcaption>
         </figure>` },
       { h: "4. Results", html: `<div class="figs">
           <div class="fig"><b>31% → 42%</b><span>of the intact progress recovered after 5 trials, ITE against ITE-SD, on damages of the simulated kind (three robots)</span></div>
@@ -584,7 +592,7 @@ const PROJECTS = [
           <a href="assets/qd-damage/qd-trials.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/qd-damage/qd-trials.png" alt="Recovered performance against the number of episodes on the damaged robot, log scale: ITE and top-k reach about 33% within 20 trials, while RL starts far below zero and only climbs back to standing-still level after about a thousand episodes." loading="lazy"></a>
           <figcaption>Recovered performance against episodes on the damaged Ant (log scale). Repertoire-based methods are done within 20 trials; plain TD3 re-training starts far below a robot standing still and needs about a thousand episodes just to get back to zero.</figcaption>
         </figure>` },
-      { h: "Explore the simulation in 3D", html: `<p>The three Ant episodes from the videos at the top, replayed in the Brax viewer. Drag to turn the camera, scroll to zoom.</p>
+      { h: "Explore the simulation in 3D", html: `<p>Three Ant episodes from the first study (intact, front-right leg paralysed, and the gait found by ITE after 6 trials), replayed in the Brax viewer. Drag to turn the camera, scroll to zoom.</p>
         <div class="sim-view"><iframe src="assets/qd-damage/3d/index.html" title="Interactive 3D replay of the three episodes" loading="lazy"></iframe></div>` },
       { h: "What is new", html: `<p>Chalumeau et al. (ICLR 2023) already damaged the Ant's legs, but picked each skill with an oracle that evaluates every one of them. This project counts the real number of trials on three robots, adds DCRL-ME, and compares against RL re-training and a damage-robust policy at the same scale of episodes. It learns the prior and the similarity of ITE from simulated damages, applying the empirical-Bayes GP prior of meta Bayesian optimisation (Wang et al., NeurIPS 2018) to the policies of a QD repertoire, and adds ITE-Sig, which also reads the damage in the robot's proprioception (an idea related to RMA, Kumar et al. 2021, but shared with the repertoire's performance model). The replay protocol makes the number of trials cheap to measure for many methods.</p>` },
       { h: "My contribution", html: `<p>Solo project, from the question to the report. I wrote the damage models and checked the mapping between actions and legs, set up the three algorithms with a shared configuration so they differ only by their emitter, implemented ITE and the baselines, fitted the Gaussian process on separate development repertoires, ran the full campaign with exact checkpoint resumption, and wrote the analysis, the visualisations and the report. I then diagnosed why ITE adds little, adapted the empirical-Bayes prior of meta Bayesian optimisation to repertoires (ITE-SD), designed ITE-Sig, the condition banks and the replay protocol, wrote down the hypotheses before the final runs, and ran the final computations on 25 GPUs of the university's teaching rooms. I also prepared an example notebook on ITE for the QDax library.</p>` },
