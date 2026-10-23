@@ -310,7 +310,7 @@ const PROJECTS = [
     year: "2026",
     context: "Independent research project",
     status: "done",
-    blurb: "Imitation policies such as ACT and Diffusion Policy usually act from the last one or two camera frames. In RoboSimon, a simulated version of the game Simon, a sequence of buttons is shown and then hidden, so the policy can only succeed if it remembers what it saw. A controlled comparison of the two policy families with the same image-history module, analysed under a pre-registered plan.",
+    blurb: "Imitation policies such as ACT and Diffusion Policy usually act from the last one or two camera frames. In RoboSimon, a simulated version of the game Simon, a sequence of buttons is shown and then hidden, so the policy can only succeed if it remembers what it saw. This project is a comparison of the two policy families with the same image-history module.",
     art: "seyes",
     media: { type: "image", src: "assets/robosimon/thumb.gif", alt: "Four policies on the same episode: ACT without memory, ACT with an image history, Diffusion Policy after 20k and after 60k training iterations." },
     hero: {
@@ -323,8 +323,8 @@ const PROJECTS = [
       caption: "One test episode (blue, yellow, red) played by four policies. The banner gives the sequence that was shown and the buttons pressed, framed in green when correct and red otherwise."
     },
     tags: ["Imitation learning", "Memory", "ACT", "Diffusion Policy"],
-    tools: ["Python", "PyTorch", "MuJoCo", "ResNet-18", "zarr", "LaTeX"],
-    keywords: ["Behaviour cloning", "Action chunking", "Partial observability", "ACT", "Diffusion Policy", "Copycat problem", "Linear probes", "Counterfactual evaluation", "Pre-registration", "Bootstrap confidence intervals"],
+    tools: ["Python", "PyTorch", "MuJoCo", "ResNet-18"],
+    keywords: ["Imitation learning", "ACT", "Diffusion Policy", "Memory", "Partial observability", "Robot manipulation"],
     facts: [
       ["Period", "Jan – May 2026"],
       ["Task", "Simon game in MuJoCo, sequences of 2 to 4 buttons, 2 s delay before execution"],
@@ -332,14 +332,14 @@ const PROJECTS = [
       ["Format", "Solo project"]
     ],
     sections: [
-      { h: "Question", html: `<p>A policy that only sees the current frame cannot solve a task in which the relevant information has disappeared from view. The obvious remedy is to give it a history of past frames, but two failure modes are documented: the policy may ignore the history, or it may learn to continue whatever it was doing, the copycat problem described by Wen et al. (2020). I wanted to know whether compact policies trained on a few hundred demonstrations actually use an image history when the task requires memory, and whether letting them see their own past positions makes them copy their previous motion.</p>` },
+      { h: "Question", html: `<p>A policy that only sees the current frame cannot solve a task in which the relevant information has disappeared from view. The obvious remedy is to give it a history of past frames, but two failure modes are documented: the policy may ignore the history, or it may learn to continue whatever it was doing, the copycat problem described by Wen et al. (2020). I wanted to test this out.</p>` },
       { h: "RoboSimon", html: `<p>Four buttons light up one after the other, all lights go off for 2 s, and a white light gives the start signal. A finger driven in Cartesian space must then press the buttons in the order they were shown. The motor part is kept trivial on purpose, so that a failure can only come from memory, and a policy with no access to the sequence succeeds with probability exactly 4<sup>−L</sup> for a sequence of length L. A scripted expert provides 500 demonstrations per length.</p>
       <figure class="shot wide">
         <a href="assets/robosimon/teaser.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/robosimon/teaser.png" alt="Top row: the three lights of the sequence, the delay and the start signal. Bottom row: the last frame of the same episode for four policies." loading="lazy"></a>
         <figcaption>Top: what the policy sees during the presentation, the delay and the start signal. Bottom: how the same episode ends for the four policies above.</figcaption>
       </figure>` },
       { h: "Method", html: `<p>ACT and Diffusion Policy receive exactly the same memory module: frames from a frozen ResNet-18, one every 0.2 s since the start of the episode, are read by a small transformer and summarised into four memory tokens. Only the action head differs between the two families. Each family is trained without memory, with the image history, with the image history plus the finger's past positions, and as an oracle that is given the sequence.</p>
-        <p>Besides success, three diagnostics describe how a policy fails. The inertia index is the fraction of the expert's decision points at which the policy's predicted actions stay closer to its previous motion than to the expert's. Linear probes test whether the sequence can be read from the memory tokens, and a counterfactual test swaps the displayed sequence for another one and checks which of the two the policy follows. Hypotheses, contrasts and decision rules were committed to the repository before the main experiment, checkpoints were selected on validation episodes, and all methods were evaluated on the same test episodes, with bootstrap intervals over seeds and episodes.</p>` },
+        <p>Besides success, three diagnostics describe how a policy fails. The inertia index is the fraction of the expert's decision points at which the policy's predicted actions stay closer to its previous motion than to the expert's. Linear probes test whether the sequence can be read from the memory tokens, and a counterfactual test swaps the displayed sequence for another one and checks which of the two the policy follows.</p>` },
       { h: "Results", html: `<div class="figs">
           <div class="fig"><b>100%</b><span>test success of ACT with an image history, for sequences of 2, 3 and 4 buttons</span></div>
           <div class="fig"><b>46% → 99.7%</b><span>Diffusion Policy at length 3, from 20k to 60k training iterations, confirmed on 12 new seeds</span></div>
@@ -355,7 +355,7 @@ const PROJECTS = [
           <figcaption>Success and inertia index with and without the past positions, one dot per seed. Copycat behaviour appears only for under-trained Diffusion Policy and is gone after 60k iterations.</figcaption>
         </figure>` },
       { h: "Why Diffusion Policy seemed to forget", html: `<p>I first tried two fixes suggested by the diagnostics and by the literature: predicting the past actions as well as the future ones (Torne et al., 2025), and giving the policy a single frame so that it could not infer its destination from its velocity. Neither helped. Training three times longer did: with 60k iterations, Diffusion Policy succeeds in 99.7% of the episodes at every length, on seeds that were not used to choose the method, and its past positions no longer affect it.</p>
-        <p>The learning curves show why the original budget was too short. The training loss of every variant has flattened by 20k iterations, which is why that budget looked sufficient, but the validation success of the image-history policy is only about half-way at that point and reaches its maximum around 40k iterations. Choosing the right button is a small part of the denoising loss and is learned late. The copycat behaviour was a stage of training, not a property of Diffusion Policy, and a budget calibrated on policies without memory is enough to make a working memory look broken.</p>
+        <p>The learning curves show why the original budget was too short. The training loss of every variant has flattened by 20k iterations, which is why that budget looked sufficient, but the validation success of the image-history policy is only about half-way at that point and reaches its maximum around 40k iterations. Choosing the right button is a small part of the denoising loss and is learned late. In other words, copying its own past motion is not a flaw of Diffusion Policy but a phase it goes through before learning the task. A training budget that is long enough for a policy without memory can be too short for one with memory, which then looks broken when it simply has not finished learning.</p>
         <figure class="shot wide">
           <a href="assets/robosimon/learning_curves.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/robosimon/learning_curves.png" alt="Left, training loss curves flattening before 20k iterations; right, validation success of Diffusion Policy rising until about 40k iterations." loading="lazy"></a>
           <figcaption>Diffusion Policy at length 3. Left: training loss, one line per run. Right: validation success of the image-history policy at each checkpoint, with ACT for comparison.</figcaption>
@@ -363,12 +363,10 @@ const PROJECTS = [
       { h: "Rollouts", html: `<figure class="shot wide"><img src="assets/robosimon/past_state.gif" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="Three policies that also see their past finger positions: ACT succeeds, Diffusion Policy after 20k iterations presses yellow twice, Diffusion Policy after 60k iterations succeeds" loading="lazy"><figcaption>With the past finger positions in the history. ACT is unaffected; Diffusion Policy after 20k iterations presses yellow a second time instead of moving on, a typical copycat error; after 60k iterations it completes the sequence.</figcaption></figure>
         <figure class="shot wide"><img src="assets/robosimon/comparison_L4.gif" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="A four-button sequence: ACT succeeds, Diffusion Policy after 20k iterations fails, Diffusion Policy after 60k iterations succeeds" loading="lazy"><figcaption>A four-button sequence (yellow, blue, blue, yellow) for ACT and for Diffusion Policy after 20k and 60k iterations.</figcaption></figure>
         <figure class="shot medium"><img src="assets/robosimon/counterfactual.gif" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="Both policies are shown a different sequence and press the first button they were shown" loading="lazy"><figcaption>Counterfactual test: the presentation was replaced by another sequence (“shown”). Both policies press the first button of the sequence they saw, which shows that they act on their memory.</figcaption></figure>` },
-      { h: "My contribution", html: `<p>Solo project. I built the MuJoCo scene, the environment and the scripted expert with their tests, generated the demonstrations and the frozen image embeddings, re-implemented the ACT and Diffusion Policy heads and the memory module, wrote the batched closed-loop evaluation and the diagnostics, ran the trainings on the university's GPU machines, and wrote the statistical analysis and the report, whose tables and figures are all generated from the per-episode results.</p>` },
-      { h: "Limitations", html: `<p>The study is limited to simulation, a Cartesian finger rather than an articulated arm, one frozen image encoder and one memory architecture. Three seeds per condition were enough for ACT but not for Diffusion Policy, and the ten-seed extension was decided after seeing the first results. Longer training fixes Diffusion Policy here, but learning curves at every length would be needed to say how much training is enough in general.</p>` }
+      { h: "My contribution", html: `<p>Solo project. I built the MuJoCo scene, the environment and the scripted expert with their tests, generated the demonstrations and the frozen image embeddings, re-implemented the ACT and Diffusion Policy heads and the memory module, wrote the batched closed-loop evaluation and the diagnostics, ran the trainings on Sorbonne University's GPU machines, and wrote the statistical analysis.</p>` },
     ],
     links: [
-      { label: "GitHub", url: "https://github.com/ananalab/robosimon" },
-      { label: "Report (PDF)", url: "assets/robosimon/report.pdf" }
+      { label: "GitHub", url: "https://github.com/ananalab/robosimon" }
     ]
   },
   {
@@ -377,7 +375,7 @@ const PROJECTS = [
     year: "2025",
     context: "Independent research project",
     status: "done",
-    blurb: "A robot model turns a camera image and an instruction into arm motions. Does it actually listen to the instruction, and how does it break when the scene drifts from its training data? A study of SmolVLA over 3,688 simulated episodes: a listening test, graded perturbations, a Quality-Diversity search for failures that only appear when perturbations combine, and two ways to repair what breaks.",
+    blurb: "A study of SmolVLA over 3,688 simulated episodes: a listening test, graded perturbations, a Quality-Diversity search for failures that only appear when perturbations combine, and two ways to repair what breaks.",
     art: "dose",
     media: { type: "image", src: "assets/vla-robustness/thumb.gif", alt: "" },
     hero: {
@@ -391,7 +389,7 @@ const PROJECTS = [
     },
     tags: ["VLA", "Robustness", "Language grounding", "Residual RL"],
     tools: ["Python", "PyTorch", "LeRobot", "LIBERO", "MuJoCo", "PPO"],
-    keywords: ["Vision-language-action models", "SmolVLA", "Language grounding", "Distribution shift", "Dose-response curves", "Robustness evaluation", "Residual reinforcement learning", "PPO", "LIBERO", "Wilson intervals"],
+    keywords: ["Vision-language-action models", "SmolVLA", "Distribution shift", "Robustness evaluation", "Residual reinforcement learning"],
     facts: [
       ["Period", "Oct – Dec 2025"],
       ["Model", "SmolVLA, 450M parameters (checkpoint lerobot/smolvla_libero)"],
@@ -399,16 +397,12 @@ const PROJECTS = [
       ["Scale", "3,688 episodes, about 40 hours of compute"]
     ],
     sections: [
-      { h: "Question", html: `<p>Vision-language-action (VLA) models receive a camera image and an instruction such as “put the bowl on the plate”, and directly output the motions of a robot arm. On simulation benchmarks they now succeed most of the time, which says little about two things that matter once the robot leaves the benchmark: is the instruction actually used, and what happens when the scene is slightly different from the demonstrations?</p>
-        <p>The project studies a small open model, SmolVLA, with three questions: does it listen, how does its success degrade as a perturbation grows, alone or combined with others, and can its weaknesses be repaired without retraining the model?</p>` },
-      { h: "Approach", html: `<ul>
-        <li><strong>Listening test.</strong> In LIBERO-Goal, ten tasks share the same scene and objects. The robot is placed in the scene of one task and given the instruction of another, and the goals of all ten tasks are checked at every step, so the test tells “ignores the instruction” apart from “follows it but fails”. Hand-written paraphrases, an empty instruction and an unrelated one complete it.</li>
-        <li><strong>Graded perturbations.</strong> Camera rotation around the scene, offset of the arm's starting pose, dimmed lighting, pixel noise and camera masking, each with a continuous intensity. For each one, a dose-response curve and a breaking point, the intensity at which success is halved, with a bootstrap over tasks for its uncertainty.</li>
-        <li><strong>Instruction canonicalisation.</strong> Before the instruction reaches the model, a small sentence encoder maps it to the closest of the 40 LIBERO training instructions; below a similarity threshold fixed in advance, it is left unchanged, so that “sing a song” is not turned into a robot task.</li>
-        <li><strong>Failure search by Quality-Diversity.</strong> MAP-Elites searches combinations of camera, arm, lighting and noise perturbations, each restricted to a range where it alone makes none of the chosen episodes fail. Any failure found is therefore an interaction. The most harmful combinations are re-run on held-out episodes.</li>
-        <li><strong>Residual RL.</strong> A small network sees the arm's state and the action proposed by the frozen VLA, and adds a bounded correction. Its last layer starts at zero, so before training it reproduces the VLA exactly. It is trained with PPO on 40 starting configurations and tested on 10 others, with fixed or randomly redrawn arm offsets.</li>
-        <li><strong>Rigour.</strong> Every condition is run on the same episodes (same starting state and random seed), one CSV row per episode, Wilson intervals and paired tests, a cross-check against the official LeRobot evaluation, and determinism checks down to the exact episode length.</li>
-      </ul>
+      { h: "Question", html: `<p>Vision-language-action (VLA) models look at a camera image, read an instruction like “put the bowl on the plate”, and move a robot arm accordingly. On simulation benchmarks they now succeed most of the time. But a high score leaves two questions open once the robot leaves the benchmark: does the model really use the instruction, or does it just recognise the scene? And what happens when the scene looks a little different from the demonstrations it was trained on?</p>
+        <p>I took a small open model, SmolVLA, and asked three questions. Does it listen? How quickly does it break as a perturbation gets stronger, on its own or mixed with others? And can its weak spots be fixed without retraining it?</p>` },
+      { h: "Approach", html: `<p>The first experiment is a listening test. In LIBERO-Goal, ten tasks share the same scene and objects. I placed the robot in the scene of one task, gave it the instruction of another, and checked at every step which of the ten goals it reached. This separates a model that ignores the instruction from one that follows it but fails. I also tried rephrased instructions, an empty one and an unrelated one.</p>
+        <p>I then applied five perturbations whose strength can be turned up gradually: rotating the camera around the scene, shifting the arm's starting pose, dimming the light, adding pixel noise and masking part of the image. For each one, I measured how success drops as the strength grows, and the point where it falls to half. Some failures only appear when several perturbations happen together. To find them, I used MAP-Elites, a Quality-Diversity algorithm, to search combinations of camera, arm, lighting and noise perturbations, each kept small enough that on its own it never made the chosen episodes fail. Any failure found therefore comes from the combination, and the worst ones were re-tested on new episodes.</p>
+        <p>Finally, I tried two repairs that leave the VLA untouched. The first rewrites the instruction: a small sentence encoder replaces it with the closest of the 40 instructions seen in training, and leaves it as it is if none is close enough, so that “sing a song” does not become a robot task. The second learns a correction, known as residual RL: a small network looks at the arm's state and at the action proposed by the frozen VLA, and adds a small correction to it. At the start it changes nothing, so before training the robot behaves exactly like the VLA. I trained it with PPO on 40 starting configurations and tested it on 10 others, with the arm's offset either fixed or redrawn at each episode.</p>
+        <p>Every condition runs on exactly the same episodes, with the same starting state and random seed, and I checked that my evaluation matches the official LeRobot one.</p>
       <figure class="shot">
         <a href="assets/vla-robustness/perturbation_grid.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/perturbation_grid.png" alt="Grid of images from the robot's main camera at five intensities for four perturbations: camera orbit, arm starting pose, lighting and pixel noise." loading="lazy"></a>
         <figcaption>What the policy sees at five intensities of each perturbation. At the strongest level every object stays visible to a human, except in the darkest lighting.</figcaption>
@@ -419,32 +413,19 @@ const PROJECTS = [
           <div class="fig"><b>≈ 3°</b><span>of offset per arm joint at the start is enough to halve success, although the objects have not moved</span></div>
           <div class="fig"><b>50%</b><span>of held-out episodes fail only because perturbations are combined: each one alone, at the same value, succeeds</span></div>
         </div>
-        <ul>
-          <li><strong>The instruction selects the task, like a key.</strong> Told to do another task of the same scene, the robot never completes the scene's own task (0/270) and completes the one it was told in 73% of cases. Rewording the same instruction breaks it, and an empty or unrelated instruction gives 0/50: without a wording it recognises, it does nothing useful.</li>
-          <li><strong>Looking up known wordings repairs it.</strong> Mapping each paraphrase to the closest training instruction brings LIBERO-Goal from 35/150 to 120/150. On LIBERO-Spatial, where instructions only differ by a spatial relation, the encoder confuses “next to” and “on” and success only rises from 26% to 54%.</li>
-          <li><strong>It breaks in different ways.</strong> Success declines gradually with the camera angle (halved around 40°), but falls off a cliff for lighting and pixel noise after a long plateau, and has only a narrow tolerance to the arm's starting pose. A single perturbation level per axis would have hidden these differences.</li>
-          <li><strong>Harmless alone, harmful together.</strong> Within ranges where each perturbation alone never breaks the chosen episodes, 98 of 120 combinations break at least one, the four together break all of them, and the most harmful combinations make 47 of 66 held-out episodes fail. Because an episode's outcome is not monotonic in the intensity, each component was also re-run alone at the same value: in 33 of the 66 episodes the combination fails while every component alone succeeds.</li>
-          <li><strong>The corrector learns, but does not generalise.</strong> It rescues starting configurations it was trained on and makes successful episodes about 20% shorter, but does not help on new configurations. Redrawing the arm offsets at every training episode does not change this, so the variety of offsets is not what limits it.</li>
-        </ul>
+        <p>SmolVLA does listen: placed in the scene of one task and told to do another, it never completes the scene's own task (0/270) and does what it was told in 73% of cases. But the instruction works like a key. A reworded instruction often fails, and an empty or unrelated one leads nowhere (0/50). Mapping paraphrases back to the closest training instruction fixes most of this on LIBERO-Goal, less on LIBERO-Spatial, where the encoder confuses “next to” and “on”.</p>
+        <p>Each perturbation breaks the model in its own way. Success drops gradually as the camera turns (halved around 40°), collapses after a long plateau for lighting and noise, and is very sensitive to the arm's starting pose. Combined, they are worse than their parts: in half of the held-out episodes, the combination fails while each perturbation alone, at the same value, succeeds. The learned correction rescues starting configurations seen in training and makes successful episodes about 20% shorter, but does not help on new ones.</p>
         <figure class="shot wide">
           <a href="assets/vla-robustness/language_matrix.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/language_matrix.png" alt="Two ten-by-ten matrices: on the left, success only on the diagonal; on the right, the instructed goal reached in most cells." loading="lazy"></a>
           <figcaption>Listening test, 300 episodes. Left: the goal of the scene is reached only when the instruction matches it. Right: the goal of the instruction actually given is reached in most cases, whatever the scene.</figcaption>
         </figure>
         <figure class="shot wide">
-          <a href="assets/vla-robustness/language_canonical.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/language_canonical.png" alt="Bar charts of paraphrase success before and after canonicalisation on LIBERO-Goal and LIBERO-Spatial, and a scatter plot of success against embedding similarity." loading="lazy"></a>
-          <figcaption>Paraphrases as written (grey) and after mapping them to the closest training instruction (blue). Right: even paraphrases very close in meaning often fail when given as written.</figcaption>
-        </figure>
-        <figure class="shot wide">
           <a href="assets/vla-robustness/dose_response.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/dose_response.png" alt="Four success-rate curves against perturbation intensity: a gradual decline for the camera, cliffs for the arm pose, lighting and noise." loading="lazy"></a>
-          <figcaption>Success against intensity on LIBERO-Spatial, 50 episodes per point, with individual tasks in grey and the breaking point with its bootstrap interval.</figcaption>
+          <figcaption>Success against perturbation strength on LIBERO-Spatial, 50 episodes per point, individual tasks in grey.</figcaption>
         </figure>
         <figure class="shot wide">
           <a href="assets/vla-robustness/qd_search.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/qd_search.png" alt="Left, a five-by-five MAP-Elites archive where almost every cell contains a failing combination; right, failure rates of the most harmful combinations on held-out episodes." loading="lazy"></a>
           <figcaption>Failure search with MAP-Elites. Left: the most harmful combination found in each region of the search space. Right: those combinations on 11 held-out episodes; dark bars are pure interactions, where each component alone succeeds on the same episode.</figcaption>
-        </figure>
-        <figure class="shot wide">
-          <a href="assets/vla-robustness/rl_residual.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/vla-robustness/rl_residual.png" alt="Left, PPO training curves for five runs; right, bar chart of success for the VLA alone and with the corrector on seen and unseen starting configurations." loading="lazy"></a>
-          <figcaption>Residual RL over five runs, three with fixed arm offsets and two with redrawn ones: better than the VLA alone on starting configurations seen in training, not on held-out ones.</figcaption>
         </figure>` },
       { h: "Watch the rollouts", html: `<div class="shots2 rollouts">
           <figure class="shot"><img src="assets/vla-robustness/language-grid.gif" width="876" height="674" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="Six instructions in the same scene" loading="lazy"><figcaption>One scene, six instructions: the robot does what it is told.</figcaption></figure>
@@ -452,13 +433,10 @@ const PROJECTS = [
           <figure class="shot"><img src="assets/vla-robustness/combined-grid.gif" width="584" height="449" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="The same episode with each perturbation alone, all successes, and with all four together, a failure" loading="lazy"><figcaption>The same episode without perturbation, with each of four perturbations alone (all successes), and with all four together (failure).</figcaption></figure>
           <figure class="shot"><img src="assets/vla-robustness/canonical-grid.gif" width="582" height="674" style="width:100%;height:auto;padding:0;border:1px solid var(--line);border-radius:var(--radius)" alt="Two paraphrased instructions that fail as written and succeed once mapped to the closest training instruction" loading="lazy"><figcaption>Paraphrases that fail as written (left) and succeed once mapped back to the closest training instruction (right).</figcaption></figure>
         </div>` },
-      { h: "What is new", html: `<p>LIBERO-Plus and LIBERO-PRO (2025) already perturb LIBERO along many axes, at a few fixed levels, and conclude that VLAs largely ignore language. This project sweeps each perturbation continuously to look at the <em>shape</em> of the degradation, scores every goal of the shared scene instead of only the scene's own goal, which shows that SmolVLA does use the instruction, repairs paraphrases at the input, and uses a Quality-Diversity search, in the spirit of search-based testing of learned systems, to show that perturbations harmless one at a time become harmful together.</p>` },
-      { h: "My contribution", html: `<p>Solo project, from the question to the report. I wrote a resumable evaluation loop on top of LeRobot's processors, implemented the perturbations and the goal-level listening test, found and fixed a silent bug where the camera and lighting changes never reached the images, wrote the statistics (Wilson intervals, McNemar tests, logistic and model-free breaking points with a task bootstrap), the instruction canonicalisation, the MAP-Elites failure search with its held-out validation, the residual RL environment and a single-file PPO, and generated every figure, table and number of the report from the per-episode logs.</p>` },
-      { h: "Limits", html: `<p>Simulation only, one model and one checkpoint, 3 to 10 episodes per condition. The measured baselines (59% on LIBERO-Spatial, 84% on LIBERO-Goal) are below the published ones, so conclusions are relative to them. The residual corrector was trained on one task with about 400 episodes per run, so its negative result says more about this budget than about residual RL in general. Canonicalisation needs the list of known tasks, and the failure search used four episodes for its fitness, which the held-out validation only partly guards against; episode outcomes are not monotonic in the intensity, so interactions are only counted against single-component controls.</p>` }
+      { h: "Limits", html: `<p>Everything here is in simulation, with a single model and only 3 to 10 episodes per condition. My baseline scores (59% on LIBERO-Spatial, 84% on LIBERO-Goal) are also below the published ones, so the results should be read relative to them. The corrector was trained on one task with a small budget, so its failure on new starts says more about that budget than about residual RL in general. Finally, rewriting the instruction only works if the list of known tasks is available.</p>` }
     ],
     links: [
-      { label: "GitHub", url: "https://github.com/ananalab/vla-stress-test" },
-      { label: "Report (PDF)", url: "assets/vla-robustness/report.pdf" }
+      { label: "GitHub", url: "https://github.com/ananalab/vla-stress-test" }
     ]
   },
   {
@@ -467,7 +445,7 @@ const PROJECTS = [
     year: "2026",
     context: "Independent research project",
     status: "done",
-    blurb: "When a robot is damaged, it must find a new way to walk in a few trials. Intelligent Trial & Error (Cully et al., Nature 2015) searches a repertoire of gaits learned beforehand in simulation. I reproduced it on three simulated robots, showed that its model is what limits it, and developed two methods that learn this model from simulated damages: ITE-SD and ITE-Sig.",
+    blurb: "A robot that loses a leg in the field has to find a new way to walk on its own, and every attempt costs time and wear. Intelligent Trial & Error (Cully et al., Nature 2015) prepares for this by learning hundreds of gaits in simulation, then tries the most promising ones after the damage. When I reproduced it on three simulated robots, it was barely better than trying the gaits in order of how well they walked before. The culprit was its model, which assumes the robot is still intact. So I broke the robots in simulation first, many times, and built two methods that learn from these damages what to expect: ITE-SD and ITE-Sig.",
     art: "duo",
     media: { type: "video", src: "assets/qd-damage/thumb.mp4", poster: "assets/qd-damage/thumb.jpg" },
     hero: {
@@ -533,9 +511,7 @@ const PROJECTS = [
           <a href="assets/qd-damage/qd-second-anytime.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/qd-damage/qd-second-anytime.png" alt="Three panels of recovered performance against the number of trials: ITE-Sig and ITE-SD rise fastest on expected damages and under a reality gap; on unexpected damages all methods are close." loading="lazy"></a>
           <figcaption>Progress recovered after k trials for the three damage families, three robots pooled. Dashed line: damage-robust TD3 policy, which does not adapt.</figcaption>
         </figure>` },
-      { h: "What is new", html: `<p>Earlier QD work on damage picked each gait with an oracle that evaluates all of them (Chalumeau et al., ICLR 2023). This project counts the real number of trials, on three robots, against RL re-training and a damage-robust policy. ITE-SD applies the empirical-Bayes prior of meta Bayesian optimisation to the gaits of a repertoire; ITE-Sig adds proprioception to it. A replay protocol makes many methods cheap to compare.</p>` },
-      { h: "My contribution", html: `<p>Solo project, from the question to the report: damage models, the three QD algorithms, ITE and its baselines, the diagnosis, the design of ITE-SD and ITE-Sig, the replay protocol, the pre-registered hypotheses, and the final runs on 25 GPUs of the university's teaching rooms.</p>` },
-      { h: "Limits", html: `<p>Simulation only. No clear gain on damages unlike the simulated ones. ITE-Sig was designed after the hypotheses were fixed, so its results are exploratory. Next steps: a wider family of simulated damages, a robust policy as the first trial, and hardware.</p>` }
+      { h: "What is new", html: `<p>ITE-SD and ITE-Sig build on Intelligent Trial & Error (Cully et al., Nature 2015), but change its model rather than its search. ITE-SD borrows the idea of Wang et al. (NeurIPS 2018), who learn the prior of a Gaussian process from functions observed offline: here, these functions are how each gait of the repertoire reacts to simulated damages. ITE-Sig goes one step further and, like RMA (Kumar et al., RSS 2021), reads the robot's sensors to infer the damage, so a single trial tells it much more.</p>` }
     ],
     links: [
       { label: "GitHub", url: "https://github.com/ananalab/qd-damage-recovery" },
@@ -687,7 +663,7 @@ return nominal_.front();  // first command sent; the rest warm-starts the next c
     year: "2025",
     context: "Independent research project",
     status: "done",
-    blurb: "Recognition of isolated signs from a webcam, in real time and entirely in the browser, from body, hand and lip landmarks. Evaluation on signers never seen during training, and study of transfer from American Sign Language (ASL) to French Belgian Sign Language (LSFB).",
+    blurb: "A small model that recognises isolated signs live from a webcam. Trained on American Sign Language (ASL) and French Belgian Sign Language (LSFB), it gets about two signs out of three right for people it has never seen. Pre-training on ASL, however, does not help with LSFB, which has far less data.",
     art: "hand",
     media: { clips: ["clown", "hello", "thankyou", "aussi"].map(c => ({ src: `assets/sign-recognition/${c}.mp4`, poster: `assets/sign-recognition/${c}.jpg` })) },
     hero: {
@@ -697,38 +673,35 @@ return nominal_.front();  // first command sent; the rest warm-starts the next c
         <figure class="vid"><video src="assets/sign-recognition/thankyou.mp4" poster="assets/sign-recognition/thankyou.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the ASL sign thank you"></video><figcaption><b>ASL - thank you</b><span>56% recognised</span></figcaption></figure>
         <figure class="vid"><video src="assets/sign-recognition/aussi.mp4" poster="assets/sign-recognition/aussi.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Landmarks of the LSFB sign AUSSI"></video><figcaption><b>LSFB - AUSSI (also)</b><span>90% recognised</span></figcaption></figure>
       </div>`,
-      caption: "What the model sees: hands, upper body and lips extracted by MediaPipe Holistic. Below each sign, the share of its test clips recognised for signers never seen during training."
+      caption: "What the model sees: hands, upper body and lips extracted by MediaPipe. Below each sign, the share of its clips recognised for people never seen in training."
     },
     tags: ["Computer vision", "Sequence models", "Transfer learning", "Web deployment"],
-    tools: ["Python", "PyTorch", "MediaPipe Holistic", "ONNX", "ONNX Runtime Web", "JavaScript", "Kaggle GPUs", "pytest"],
-    keywords: ["Isolated sign recognition", "Transfer learning", "Signer-independent evaluation", "Pose landmarks", "Conv-Transformer", "MediaPipe Holistic", "Bidirectional GRU", "ONNX Runtime Web", "Data augmentation"],
+    tools: ["Python", "PyTorch", "MediaPipe", "ONNX Runtime Web", "JavaScript"],
+    keywords: ["Isolated sign recognition", "Transfer learning", "Signer-independent evaluation", "Pose landmarks"],
     facts: [
       ["Period", "Sep – Dec 2025"],
-      ["Task", "Isolated sign recognition, closed vocabulary"],
-      ["Input", "MediaPipe Holistic landmarks: 89 points per frame (hands, upper body, lips)"],
-      ["Model", "Convolutional neural network with self-attention (Conv-Transformer, 2.2 M parameters), compared with a bidirectional GRU"],
-      ["Data", "Google ISLR: 250 ASL signs, 94,477 clips, 21 signers<br>LSFB-ISOL: 100 LSFB signs, 55,286 clips, 99 signers"],
-      ["Evaluation", "Signer-independent: 4 ASL and 40 LSFB test signers, three seeds per model"]
+      ["Task", "Isolated signs, fixed vocabulary"],
+      ["Input", "Landmarks of the hands, upper body and lips"],
+      ["Model", "Small Conv-Transformer (2.2M parameters)"],
+      ["Data", "250 ASL signs, 21 signers<br>100 LSFB signs, 99 signers"],
+      ["Evaluation", "On people never seen in training"]
     ],
     sections: [
-      { h: "Context and objectives", html: `<p>This project addresses <em>isolated</em> sign recognition: identifying a single sign from a closed vocabulary. It is not translation, which would require the grammar, use of space and facial expressions of the language. Models work on landmarks rather than pixels, which keeps them small, fast on CPU and independent of background, and avoids transmitting any video.</p>
-        <p>Three questions guide the study: what accuracy can be expected on people never seen during training, whether a model pre-trained on ASL helps on LSFB, a language with far less labelled data (and distinct from French Sign Language, LSF), and whether recognition can run in real time in a browser without GPU.</p>` },
-      { h: "Method", html: `<ul>
-        <li><strong>Preprocessing.</strong> Landmarks mirrored to a canonical dominant hand, normalised in the body frame and resampled to 64 frames. A single unit-tested function is shared by training and by its JavaScript port in the browser.</li>
-        <li><strong>Training.</strong> Both networks and a statistical baseline trained with three seeds each on Kaggle GPUs, with time-warping and spatial augmentations.</li>
-        <li><strong>Protocol.</strong> Signer-independent splits frozen before any experiment; test sets used once, for the final models.</li>
-      </ul>` },
-      { h: "Key results", html: `<div class="figs">
+      { h: "Question", html: `<p>The idea was simple: someone signs in front of a webcam and sees, live, which sign they just made. I focused on <em>isolated</em> signs from a fixed vocabulary, which is much easier than translation.</p>
+        <p>The model never sees raw pixels, only the landmarks MediaPipe extracts from the hands, upper body and lips, which keeps it small and fast. I wanted to know how well it works on people it has never seen, and whether learning ASL first helps with LSFB, a language with far less labelled data.</p>` },
+      { h: "Approach", html: `<p>Every clip is mirrored so that the dominant hand is always on the same side, then expressed relative to the body. I trained a small convolutional network with self-attention (Conv-Transformer) and compared it with a recurrent network (GRU) and a simple statistical baseline.</p>
+        <p>The test signers never appear in training. This matters more than it seems: when the same people show up in both, accuracy looks 17 points better than it really is.</p>` },
+      { h: "Results", html: `<div class="figs">
           <div class="fig"><b>64.8%</b><span>top-1 on 250 ASL signs and 4 unseen signers (chance: 0.4%, statistical baseline: 42.1%)</span></div>
           <div class="fig"><b>68.3%</b><span>top-1 on 100 LSFB signs and 40 unseen signers (statistical baseline: 49.0%)</span></div>
-          <div class="fig"><b>+16.9 pts</b><span>overestimation when the same signers appear in training and test (random split)</span></div>
-          <div class="fig"><b>16 ms</b><span>per sign in the browser on one CPU thread, with the same predictions as PyTorch on 40 of 40 clips</span></div>
+                    <div class="fig"><b>16 ms</b><span>per sign on a single CPU thread, fast enough for live use</span></div>
         </div>
+        <p>On people it has never seen, the model gets about two signs out of three right, in both languages. Accuracy changes from one person to another, and mostly depends on one thing: whether MediaPipe finds the hands. When they are missing in more than half of the frames, which happens in 30% of the ASL test clips, accuracy drops to 52%.</p>
         <figure class="shot wide">
           <a href="assets/sign-recognition/signers_missing.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/signers_missing.png" alt="Two panels: ASL test accuracy per unseen signer, between about 61% and 70%, and accuracy against the share of frames without a detected hand, falling from about 76% to 52% beyond half of the frames." loading="lazy"></a>
-          <figcaption>Accuracy varies from one unseen signer to another (a), and depends above all on whether MediaPipe finds the hands (b): 76% when they are missing in at most 10% of the frames, 52% beyond half, a case that concerns 30% of the ASL test clips.</figcaption>
+          <figcaption>(a) Accuracy for each unseen ASL signer. (b) Accuracy against the share of frames where no hand is found.</figcaption>
         </figure>` },
-      { h: "Which signs are recognised best, and why", html: `<div class="tbl-wrap"><table class="tbl">
+      { h: "Easy signs and hard signs", html: `<div class="tbl-wrap"><table class="tbl">
           <thead><tr><th>ASL sign</th><th class="num">Recognised</th><th>Most frequent confusion</th></tr></thead>
           <tbody>
             <tr class="grp"><td colspan="3">Best-recognised signs</td></tr>
@@ -741,49 +714,34 @@ return nominal_.front();  // first command sent; the rest warm-starts the next c
             <tr><td>thank you</td><td class="num">56%</td><td><i>bad</i> (10%)</td></tr>
             <tr><td>mom</td><td class="num">52%</td><td><i>farm</i> (14%)</td></tr>
           </tbody>
-          <caption>Share of each sign's test clips recognised by the Conv-Transformer (mean over three seeds). Median over the 250 signs: 67%.</caption>
+          <caption>Share of each sign's test clips recognised. Median over the 250 signs: 67%.</caption>
         </table></div>
-        <p>All signs have a similar number of training clips, so what matters is how distinct a sign is from the others, not how common it is.</p>
-        <ul>
-          <li><strong>The best signs are produced on the face.</strong> <i>Clown</i>, <i>flower</i> and <i>owl</i> are articulated at the nose or the eyes, each with a handshape that no other sign uses there.</li>
-          <li><strong>Basic signs have close neighbours.</strong> <i>Hello</i>, <i>thank you</i> and <i>mom</i> use the most common handshapes (flat or spread hand) at the forehead or chin, where many signs are made. <i>Thank you</i> and <i>bad</i> differ mainly in the final palm orientation, poorly captured in 2D; <i>mom</i> and <i>farm</i> differ only by a tap versus a sweep across the chin. Everyday signs with a distinctive movement, such as <i>please</i>, remain easy.</li>
-        </ul>` },
-      { h: "No transfer from ASL to LSFB", html: `<p>Contrary to the initial hypothesis, initialising the LSFB model from ASL never helps, from 5 examples per sign to the full corpus (left), and with all the data it is even slightly but significantly harmful (66.2% against 68.3% from scratch, on 40 unseen signers). A likely explanation is that the corpora differ in more than the language: isolated signs filmed on a smartphone for ASL, where the hands often leave the frame (right), against signs cut from studio conversations, twice as short, for LSFB.</p>
+        <p>The easiest signs are made on the face, like <i>clown</i>, <i>flower</i> and <i>owl</i>, each with a handshape that no other sign uses there. Everyday signs are harder. <i>Hello</i>, <i>thank you</i> and <i>mom</i> use the most common handshapes, at the forehead or chin, where many other signs are made. <i>Thank you</i> and <i>bad</i> mostly differ in the final orientation of the palm, which is hard to see in 2D, and <i>mom</i> and <i>farm</i> only differ by a tap versus a sweep across the chin. Since every sign has about as many training clips, what matters is how distinct a sign is, not how common.</p>` },
+      { h: "Learning ASL first does not help", html: `<p>I expected a model pre-trained on ASL to pick up LSFB faster. It does not: starting from ASL never helps, from 5 examples per sign to the full dataset, and with all the data it is even slightly worse (66.2% against 68.3%). My best guess is that the two datasets differ in more than the language. The ASL clips were filmed on smartphones, with the hands often out of frame, while the LSFB signs are cut from studio conversations and are twice as short.</p>
         <div class="shots2">
         <figure class="shot">
           <a href="assets/sign-recognition/transfer_curve.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/transfer_curve.png" alt="Line chart of LSFB validation accuracy against training examples per sign, from 5 to all: the from-scratch and ASL-pretrained curves overlap up to 25 examples, then from-scratch stays slightly above." loading="lazy"></a>
-          <figcaption>LSFB validation accuracy against training examples per sign (mean ± s.d. over three seeds).</figcaption>
+          <figcaption>LSFB accuracy against the number of training examples per sign, from scratch or starting from ASL.</figcaption>
         </figure>
         <figure class="shot">
           <a href="assets/sign-recognition/missing_parts.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/missing_parts.png" alt="Bar chart of frames with a body part missing: in ASL, left hand 72%, right hand 62%, both hands 34%; in LSFB, 10%, 8% and 2%; upper body and lips almost never missing." loading="lazy"></a>
-          <figcaption>Share of frames in which MediaPipe misses each body part: no hand at all in 34% of ASL frames, against 2% for LSFB.</figcaption>
+          <figcaption>Share of frames where MediaPipe misses each body part: no hand at all in 34% of ASL frames, against 2% for LSFB.</figcaption>
         </figure>
         </div>` },
-      { h: "What matters, and pitfalls uncovered", html: `<figure class="shot medium">
+      { h: "What helps", html: `<p>Mirroring every clip to the same dominant hand is by far the most useful step. Velocities and data augmentation help a little, while lips, depth and longer sequences do not.</p>
+        <figure class="shot medium">
           <a href="assets/sign-recognition/ablations.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/ablations.png" alt="Horizontal bar chart of the change in ASL validation accuracy for each ablation: removing the canonical dominant hand costs 3.8 points, velocities 1.7, augmentation 1.3, while removing lips or zero-padding instead of resampling slightly helps." loading="lazy"></a>
-          <figcaption>One-factor ablations on ASL (change in validation accuracy, in points). Mirroring every clip to a canonical dominant hand matters most; lips, depth and longer sequences do not help. †: run ended early, effect possibly overestimated.</figcaption>
-        </figure>
-        <figure class="shot wide">
-          <a href="assets/sign-recognition/normalisation.png" target="_blank" rel="noopener" title="Open full size"><img src="assets/sign-recognition/normalisation.png" alt="Three scatter plots of ASL and LSFB landmarks: in image coordinates, in the body frame without aspect correction where the LSFB nose lies far above the ASL one, and after correction where both align." loading="lazy"></a>
-          <figcaption>Anamorphic LSFB videos: in the body frame, the LSFB nose lies far above the ASL one (b) until the aspect ratio is corrected (c).</figcaption>
-        </figure>
-        <ul>
-        <li><strong>Quantisation.</strong> Naive INT8 quantisation halves accuracy (68% to 34%) because of rare feature outliers, and even once fixed, the model is slower on CPU; the demo ships FP32.</li>
-        <li><strong>Early stopping.</strong> Stopping on a plateau made one ablation look five times more harmful than it is.</li>
-      </ul>` },
-      { h: "Interactive demo", html: `<figure class="shot wide">
-          <a href="assets/sign-recognition/demo/index.html" target="_blank" rel="noopener" title="Open the demo"><img src="assets/sign-recognition/demo.png" alt="Demo interface: on the left, the replayed skeleton of an LSFB clip; on the right, the prediction EQUIPE at 84%, the top-5 signs, signs to try and the vocabulary." loading="lazy"></a>
-          <figcaption>Signs are segmented automatically from the webcam and classified locally; LSFB test clips can also be replayed without a camera. Click the image to open the demo.</figcaption>
+          <figcaption>Change in ASL accuracy when one ingredient is removed, in points. †: run ended early, effect possibly overestimated.</figcaption>
         </figure>` },
-      { h: "Limitations", html: `<ul>
-        <li>Few signers (21 for ASL): accuracy on a new user can be well below the average.</li>
-        <li>Only the lips are used from the face, whereas eyebrows, gaze and head movements carry part of the grammar.</li>
-        <li>Not evaluated with Deaf signers; such technologies should be built with and for Deaf communities.</li>
-      </ul>` }
+      { h: "Interactive demo", html: `<p>In the demo, signs are cut out of the webcam stream automatically and recognised as you go. LSFB test clips can also be replayed without a camera.</p>
+        <figure class="shot wide">
+          <a href="assets/sign-recognition/demo/index.html" target="_blank" rel="noopener" title="Open the demo"><img src="assets/sign-recognition/demo.png" alt="Demo interface: on the left, the replayed skeleton of an LSFB clip; on the right, the prediction EQUIPE at 84%, the top-5 signs, signs to try and the vocabulary." loading="lazy"></a>
+          <figcaption>Click the image to open the demo.</figcaption>
+        </figure>` },
+      { h: "Limits", html: `<p>The ASL data only has 21 signers, so accuracy on a new person can be well below average. And from the face, the model only uses the lips, whereas eyebrows, gaze and head movements carry part of the grammar.</p>` }
     ],
     links: [
       { label: "Live demo", url: "assets/sign-recognition/demo/index.html" },
-      { label: "Paper (PDF)", url: "assets/sign-recognition/paper.pdf" },
       { label: "GitHub", url: "https://github.com/ananalab/Sign-recognition-with-a-Conv-Transformer" }
     ]
   },
