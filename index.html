@@ -285,7 +285,7 @@ const PROFILE = {
   languages: "French (native) · English (proficient) · Arabic (proficient) · Japanese (basic)",
   timeline: [
     { when: "From March 2027", what: "Research internship, 6 months", where: "Currently looking for a lab", state: "next" },
-    { when: "Jun – Aug 2026", what: "Research internship", where: "Interpretable models for intensive care · REVA team, IRIT, Toulouse" },
+    { when: "Jun – Aug 2026", what: "Research internship", where: "Interpretable models for intensive care · REVA team, IRIT, Toulouse", project: "icu-risk" },
     { when: "Feb – May 2026", what: "Research project", where: "Real-to-Sim scene generation · ISIR, Sorbonne Université", project: "real-to-sim" },
     { when: "2025 – 2027", what: "Master's in Computer Science", where: "AI2D track · Sorbonne Université, Paris", state: "now" },
     { when: "2022 – 2025", what: "Bachelor's in Computer Science", where: "Sorbonne Université, Paris" }
@@ -298,7 +298,7 @@ const PROFILE = {
     { title: "Real-to-Sim: generating physically valid robot simulation scenes from text and images with LLMs and VLMs",
       authors: "A. Azouaoui, C. Zouloumian, E. Garrabé, S. Doncieux", project: "real-to-sim" },
     { title: "Interpretable prediction of clinician-rated respiratory severity in intensive care with genetic programming",
-      authors: "A. Azouaoui, G. Nadizar, S. Cussat-Blanc, D. Wilson, M. Poette" }
+      authors: "A. Azouaoui, G. Nadizar, S. Cussat-Blanc, D. Wilson, M. Poette", project: "icu-risk" }
   ],
   updated: "October 2026"
 };
@@ -861,6 +861,40 @@ return nominal_.front();  // first command sent; the rest warm-starts the next c
     ]
   },
   {
+    id: "icu-risk",
+    title: "Interpretable severity formulas for ventilated ICU patients",
+    year: "2026",
+    context: "Research internship · IRIT, Toulouse",
+    status: "done",
+    blurb: "Symbolic regression by genetic programming to model, as explicit and clinically interpretable expressions, the severity assessment of respiratory disorders in mechanically ventilated patients.",
+    art: "graph",
+    media: { caption: "Methods, results, report and code are currently confidential, pending publication in a medical journal." },
+    tags: ["Genetic programming", "Symbolic regression", "Interpretable ML", "Healthcare"],
+    tools: ["Python", "scikit-learn", "PySR", "gplearn", "hal-cgp", "SHAP", "Gemini"],
+    keywords: ["Genetic programming", "Symbolic regression", "Interpretable machine learning", "Cartesian genetic programming", "Mechanical ventilation", "Intensive care", "Small-data learning"],
+    facts: [
+      ["Lab", `REVA team, <a class="ext" href="https://www.irit.fr/" target="_blank" rel="noopener">Institut de Recherche en Informatique de Toulouse</a>, Université Toulouse Capitole`],
+      ["Clinical partner", "Intensive care unit, CHU de Toulouse"],
+      ["Supervision", "Dr. Giorgia Nadizar, postdoctoral researcher, IRIT<br>Prof. Sylvain Cussat-Blanc, IRIT<br>Prof. Dennis Wilson, ISAE-Supaero<br>Dr. Michael Poette, ICU, CHU de Toulouse"],
+      ["Period", "Jun – Aug 2026 (M1 internship)"],
+      ["Data", "Mechanically ventilated ICU patients, with severity scores annotated by clinicians"]
+    ],
+    sections: [
+      { h: "Context and objectives", html: `<p>Assessing the severity of a mechanically ventilated patient requires the joint interpretation of many physiological parameters. This expertise is largely implicit, which makes it difficult to formalise, to teach and to audit. Machine-learning models can reproduce such judgements, but their opacity limits their clinical adoption, and post-hoc explanation methods do not describe how the variables are actually combined.</p>
+        <p>This work investigates whether explicit mathematical expressions obtained by genetic programming can reach the predictive performance of black-box models, how many annotated patients they require, and what they reveal about the underlying clinical reasoning.</p>` },
+      { h: "Contributions", html: `<ul>
+        <li>Design of an evaluation protocol free of information leakage, adapted to a small clinical cohort and to a target defined by noisy expert judgement.</li>
+        <li>Benchmark of standard machine-learning models to establish a black-box reference.</li>
+        <li>Implementation of a Cartesian genetic programming engine from scratch, compared with established symbolic-regression libraries.</li>
+        <li>Quantitative assessment of formula interpretability and analysis of the trade-off between interpretability and predictive accuracy.</li>
+        <li>Use of the resulting expressions to analyse clinical reasoning, including the comparison of clinicians with different levels of experience.</li>
+        <li>Exploratory study of large language models as assistants to symbolic regression, each evaluated against a control condition.</li>
+      </ul>` },
+      { h: "Confidentiality", html: `<p>The detailed methods and results, as well as the report and source code, are currently confidential, as this work is being prepared for submission to a medical journal.</p>` }
+    ],
+    links: []
+  },
+  {
     id: "llm-reward",
     hidden: true, // unfinished: remove this line to show it again
     title: "Can a VLM write a robot's reward?",
@@ -967,7 +1001,7 @@ function renderHome() {
         <p class="interests"><b>Interests</b>${P.interests.map(i => `<span>${i}</span>`).join("")}</p>
       </div>
       <aside class="pubs">
-        <h2>Publications <span>in preparation</span></h2>${P.publications.map(q => `<a class="pub"${q.project ? ` href="#${q.project}"` : ""}><span class="pub-title">${q.title}</span><span class="pub-authors">${q.authors.replace("A. Azouaoui", "<b>A. Azouaoui</b>")}</span></a>`).join("")}
+        <h2>Publications <span>in preparation</span></h2>${P.publications.map(q => `<a class="pub" href="#${q.project}"><span class="pub-title">${q.title}</span><span class="pub-authors">${q.authors.replace("A. Azouaoui", "<b>A. Azouaoui</b>")}</span></a>`).join("")}
       </aside>
     </div>`;
 
